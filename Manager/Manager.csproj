@@ -10,11 +10,4 @@
     <ProjectReference Include="..\PasswordV2\PasswordV2.csproj" />
     <ProjectReference Include="..\Password\Password.csproj" />
   </ItemGroup>
-
-  <!--Testing data-->
-  <ItemGroup>
-    <None Include="Entries\**\*.entry" Condition=" ('$(Configuration)'=='DEBUG')">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
 </Project>
