@@ -38,6 +38,7 @@ namespace Password
         }
         /// <summary>
         /// The domain name for the service. Leave as <see cref="null"/> when not applicable. 
+        /// Note: It might behave a bit wonky with regards to the whole heap/stack since it is saved internally as an encrypted string.
         /// </summary>
         public Uri Domain
         {
