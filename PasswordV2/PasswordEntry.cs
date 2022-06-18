@@ -64,7 +64,7 @@ namespace Password
             set { service = value; }
         }
         /// <summary>
-        /// The password. Use <see cref="GetPassword(byte[])"/> to get the password.
+        /// The password.
         /// </summary>
         public string Password
         {
@@ -212,9 +212,8 @@ namespace Password
         /// </summary>
         public void Delete()
         {
-            string filename = Filename;
-            if (File.Exists(filename))
-                File.Delete(filename);
+            if (File.Exists(Filename))
+                File.Delete(Filename);
         }
         private byte[] Encrypt(string toBeEncrypted)
         {
