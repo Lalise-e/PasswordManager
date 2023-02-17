@@ -139,12 +139,16 @@ namespace Manager
             }
             ProcessStartInfo info = new()
             {
-                FileName = "msedge",
+                FileName = "firefox",
                 UseShellExecute = true
             };
             if (settings.Incognito)
             {
-                info.Arguments += $"{textBoxInfoDomain.Text} -inprivate";
+                info.Arguments += $"-private-window {textBoxInfoDomain.Text}";
+            }
+            else
+            {
+                info.Arguments += $"{textBoxInfoDomain.Text}";
             }
             try { Process.Start(info); }
             catch(Exception ex) { DisplayError(ex); }
