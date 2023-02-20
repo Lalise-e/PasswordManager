@@ -49,6 +49,7 @@ namespace Manager
             this.toolStripMenuItemFont = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItemBackground = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItemIncognito = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItemPassword = new System.Windows.Forms.ToolStripMenuItem();
             this.buttonWebsite = new System.Windows.Forms.Button();
             this.infoPanel.SuspendLayout();
             this.menuStrip1.SuspendLayout();
@@ -151,7 +152,6 @@ namespace Manager
             // 
             // listViewEntries
             // 
-            this.listViewEntries.HideSelection = false;
             this.listViewEntries.Location = new System.Drawing.Point(12, 26);
             this.listViewEntries.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.listViewEntries.MultiSelect = false;
@@ -235,7 +235,8 @@ namespace Manager
             this.toolStripMenuSettings.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripMenuItemFont,
             this.toolStripMenuItemBackground,
-            this.toolStripMenuItemIncognito});
+            this.toolStripMenuItemIncognito,
+            this.toolStripMenuItemPassword});
             this.toolStripMenuSettings.Name = "toolStripMenuSettings";
             this.toolStripMenuSettings.Size = new System.Drawing.Size(61, 20);
             this.toolStripMenuSettings.Text = "Settings";
@@ -243,21 +244,27 @@ namespace Manager
             // toolStripMenuItemFont
             // 
             this.toolStripMenuItemFont.Name = "toolStripMenuItemFont";
-            this.toolStripMenuItemFont.Size = new System.Drawing.Size(165, 22);
+            this.toolStripMenuItemFont.Size = new System.Drawing.Size(180, 22);
             this.toolStripMenuItemFont.Text = "Font";
             // 
             // toolStripMenuItemBackground
             // 
             this.toolStripMenuItemBackground.Name = "toolStripMenuItemBackground";
-            this.toolStripMenuItemBackground.Size = new System.Drawing.Size(165, 22);
+            this.toolStripMenuItemBackground.Size = new System.Drawing.Size(180, 22);
             this.toolStripMenuItemBackground.Text = "Background";
             // 
             // toolStripMenuItemIncognito
             // 
             this.toolStripMenuItemIncognito.CheckOnClick = true;
             this.toolStripMenuItemIncognito.Name = "toolStripMenuItemIncognito";
-            this.toolStripMenuItemIncognito.Size = new System.Drawing.Size(165, 22);
+            this.toolStripMenuItemIncognito.Size = new System.Drawing.Size(180, 22);
             this.toolStripMenuItemIncognito.Text = "Start in incognito";
+            // 
+            // toolStripMenuItemPassword
+            // 
+            this.toolStripMenuItemPassword.Name = "toolStripMenuItemPassword";
+            this.toolStripMenuItemPassword.Size = new System.Drawing.Size(180, 22);
+            this.toolStripMenuItemPassword.Text = "Change Password";
             // 
             // buttonWebsite
             // 
@@ -320,6 +327,7 @@ namespace Manager
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemBackground;
         private System.Windows.Forms.Button buttonWebsite;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemIncognito;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemPassword;
     }
 }
 

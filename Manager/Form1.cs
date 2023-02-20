@@ -38,6 +38,7 @@ namespace Manager
             toolStripMenuItemFont.Click += ToolStripMenuItemFont_Click;
             toolStripMenuItemBackground.Click += ToolStripMenuItemBackground_Click;
             toolStripMenuItemIncognito.Click += ToolStripMenuItemIncognito_Click;
+            toolStripMenuItemPassword.Click += ToolStripMenuItemPassword_Click;
             using(PasswordFetcher fetcher = new())
             {
                 DialogResult result = fetcher.ShowDialog();
@@ -84,6 +85,43 @@ namespace Manager
                     this.ApplySettings();
                 }
             }
+        }
+        private void ToolStripMenuItemPassword_Click(object sender, EventArgs e)
+        {
+            string newPassword = null;
+            using(PasswordChanger changer = new())
+            {
+                changer.Tag = MasterPassword;
+                DialogResult dialogResult = changer.ShowDialog();
+                if (dialogResult != DialogResult.OK)
+                    return;
+                newPassword = changer.Tag.ToString();
+            }
+            string[] files = Directory.GetFiles(EntryDirectory);
+            foreach(string file in files)
+            {
+                if (!File.Exists(file))
+                    continue;
+                PasswordEntry oldEntry = null;
+                try { oldEntry = new(GetHash(MasterPassword), file); }
+                catch
+                {
+                    DisplayError($"File: {file} is corrupt.{Environment.NewLine} Either that or I suck at coding, no idea which it is.");
+                    File.Delete(file);
+                    continue;
+                }
+                PasswordEntry newEntry = new(GetHash(newPassword))
+                {
+                    Password = oldEntry.Password,
+                    Domain = oldEntry.Domain,
+                    Service = oldEntry.Service,
+                    AccountName = oldEntry.AccountName
+                };
+                oldEntry.Delete();
+                newEntry.Save();
+            }
+            MasterPassword = newPassword;
+            LoadListItems();
         }
         private void ListViewEntries_ItemActivate(object sender, EventArgs e)
         {
