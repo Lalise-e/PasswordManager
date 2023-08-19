@@ -29,54 +29,56 @@ namespace Manager
         /// </summary>
         private void InitializeComponent()
         {
-            this.label1 = new System.Windows.Forms.Label();
-            this.textBoxPassword = new System.Windows.Forms.TextBox();
-            this.buttonOk = new System.Windows.Forms.Button();
-            this.SuspendLayout();
+            label1 = new System.Windows.Forms.Label();
+            textBoxPassword = new System.Windows.Forms.TextBox();
+            buttonOk = new System.Windows.Forms.Button();
+            SuspendLayout();
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 9);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(149, 15);
-            this.label1.TabIndex = 3;
-            this.label1.Text = "Enter the master password.";
+            label1.AutoSize = true;
+            label1.Location = new System.Drawing.Point(14, 12);
+            label1.Name = "label1";
+            label1.Size = new System.Drawing.Size(187, 20);
+            label1.TabIndex = 3;
+            label1.Text = "Enter the master password.";
             // 
             // textBoxPassword
             // 
-            this.textBoxPassword.Location = new System.Drawing.Point(12, 27);
-            this.textBoxPassword.Name = "textBoxPassword";
-            this.textBoxPassword.PasswordChar = '*';
-            this.textBoxPassword.Size = new System.Drawing.Size(231, 23);
-            this.textBoxPassword.TabIndex = 0;
+            textBoxPassword.Location = new System.Drawing.Point(14, 36);
+            textBoxPassword.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            textBoxPassword.Name = "textBoxPassword";
+            textBoxPassword.PasswordChar = '*';
+            textBoxPassword.Size = new System.Drawing.Size(263, 27);
+            textBoxPassword.TabIndex = 0;
             // 
             // buttonOk
             // 
-            this.buttonOk.Location = new System.Drawing.Point(12, 56);
-            this.buttonOk.Name = "buttonOk";
-            this.buttonOk.Size = new System.Drawing.Size(231, 24);
-            this.buttonOk.TabIndex = 1;
-            this.buttonOk.Text = "Ok";
-            this.buttonOk.UseVisualStyleBackColor = true;
-            this.buttonOk.Click += new System.EventHandler(this.buttonOk_Click);
+            buttonOk.Location = new System.Drawing.Point(14, 75);
+            buttonOk.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            buttonOk.Name = "buttonOk";
+            buttonOk.Size = new System.Drawing.Size(264, 32);
+            buttonOk.TabIndex = 1;
+            buttonOk.Text = "Ok";
+            buttonOk.UseVisualStyleBackColor = true;
+            buttonOk.Click += buttonOk_Click;
             // 
             // PasswordFetcher
             // 
-            this.AcceptButton = this.buttonOk;
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(255, 92);
-            this.ControlBox = false;
-            this.Controls.Add(this.buttonOk);
-            this.Controls.Add(this.textBoxPassword);
-            this.Controls.Add(this.label1);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-            this.Name = "PasswordFetcher";
-            this.Text = "PasswordFetcher";
-            this.ResumeLayout(false);
-            this.PerformLayout();
-
+            AcceptButton = buttonOk;
+            AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            ClientSize = new System.Drawing.Size(291, 116);
+            ControlBox = false;
+            Controls.Add(buttonOk);
+            Controls.Add(textBoxPassword);
+            Controls.Add(label1);
+            FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            Name = "PasswordFetcher";
+            Text = "PasswordFetcher";
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion

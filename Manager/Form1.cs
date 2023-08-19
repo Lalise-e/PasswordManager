@@ -39,14 +39,14 @@ namespace Manager
             toolStripMenuItemBackground.Click += ToolStripMenuItemBackground_Click;
             toolStripMenuItemIncognito.Click += ToolStripMenuItemIncognito_Click;
             toolStripMenuItemPassword.Click += ToolStripMenuItemPassword_Click;
-            using(PasswordFetcher fetcher = new())
+            using (PasswordFetcher fetcher = new())
             {
                 DialogResult result = fetcher.ShowDialog();
                 if (result == DialogResult.OK)
                     MasterPassword = fetcher.Password;
             }
             try { PasswordPatcher.OneToTwoPatcher(EntryDirectory, GetHash(MasterPassword)); }
-            catch (CryptographicException) { DisplayError("Wrong master password."); Environment.Exit(0);}
+            catch (CryptographicException) { DisplayError("Wrong master password."); Environment.Exit(0); }
             LoadListItems();
         }
         private void ToolStripMenuItemIncognito_Click(object sender, EventArgs e)
@@ -56,7 +56,7 @@ namespace Manager
         }
         private void ToolStripMenuItemBackground_Click(object sender, EventArgs e)
         {
-            using(OpenFileDialog dialog = new())
+            using (OpenFileDialog dialog = new())
             {
                 dialog.Multiselect = false;
                 dialog.Filter = "Image Files(*.BMP;*.JPG;*.JPEG;*.PNG;*.TIFF;*.TIF;*.GIF)|*.BMP;*.JPG;*.JPEG;*.PNG;*.TIFF;*.TIF;*.GIF";
@@ -75,7 +75,7 @@ namespace Manager
         }
         private void ToolStripMenuItemFont_Click(object sender, EventArgs e)
         {
-            using(FontDialog dialog = new())
+            using (FontDialog dialog = new())
             {
                 DialogResult result = dialog.ShowDialog();
                 if (result == DialogResult.OK)
@@ -89,7 +89,7 @@ namespace Manager
         private void ToolStripMenuItemPassword_Click(object sender, EventArgs e)
         {
             string newPassword = null;
-            using(PasswordChanger changer = new())
+            using (PasswordChanger changer = new())
             {
                 changer.Tag = MasterPassword;
                 DialogResult dialogResult = changer.ShowDialog();
@@ -98,7 +98,7 @@ namespace Manager
                 newPassword = changer.Tag.ToString();
             }
             string[] files = Directory.GetFiles(EntryDirectory);
-            foreach(string file in files)
+            foreach (string file in files)
             {
                 if (!File.Exists(file))
                     continue;
@@ -142,7 +142,7 @@ namespace Manager
             PasswordEntry entry;
             try { entry = GetActiveEntry(); }
             catch { return; }
-            using(EntryMaker maker = new(GetHash(MasterPassword), entry))
+            using (EntryMaker maker = new(GetHash(MasterPassword), entry))
             {
                 DialogResult result = handleMaker(maker);
                 if (result == DialogResult.OK)
@@ -189,7 +189,7 @@ namespace Manager
                 info.Arguments += $"{textBoxInfoDomain.Text}";
             }
             try { Process.Start(info); }
-            catch(Exception ex) { DisplayError(ex); }
+            catch (Exception ex) { DisplayError(ex); }
         }
         private void checkBoxVisible_CheckedChanged(object sender, EventArgs e)
         {
@@ -213,7 +213,7 @@ namespace Manager
         private void LoadListItems()
         {
             listViewEntries.Items.Clear();
-            foreach(string path in Directory.GetFiles(EntryDirectory))
+            foreach (string path in Directory.GetFiles(EntryDirectory))
             {
                 PasswordEntry entry;
                 ListViewItem item;
@@ -226,10 +226,10 @@ namespace Manager
                         Tag = entry,
                     };
                 }
-                catch(CryptographicException) { DisplayError("Wrong master password."); Environment.Exit(0); return; }
-                catch(FileNotFoundException e) { DisplayError($"File {e.FileName} not found."); continue; }
-                catch(FileLoadException e) { DisplayError($"File {e.FileName} was corrupt"); continue; }
-                catch(Exception e) { DisplayError(e); continue; }
+                catch (CryptographicException) { DisplayError("Wrong master password."); Environment.Exit(0); return; }
+                catch (FileNotFoundException e) { DisplayError($"File {e.FileName} not found."); continue; }
+                catch (FileLoadException e) { DisplayError($"File {e.FileName} was corrupt"); continue; }
+                catch (Exception e) { DisplayError(e); continue; }
                 listViewEntries.Items.Add(item);
             }
         }
@@ -266,7 +266,7 @@ namespace Manager
         }
         internal static void DisplayError(Exception e) => DisplayError(e.Message);
         internal static void DisplayError(string message) => MessageBox.Show(message, "Error", MessageBoxButtons.OKCancel, MessageBoxIcon.Error);
-        internal static byte[] GetHash(string text)=> SHA256.Create().ComputeHash(Encoding.Unicode.GetBytes(text));
+        internal static byte[] GetHash(string text) => SHA256.Create().ComputeHash(Encoding.Unicode.GetBytes(text));
         internal static string GetHexString(byte[] bytes)
         {
             StringBuilder builder = new(bytes.Length * 2);

@@ -31,7 +31,7 @@ namespace Manager
                     checkBoxSpecial.Checked,
                     textBoxBanned.Text.ToCharArray());
             }
-            catch(ArgumentException error)
+            catch (ArgumentException error)
             {
                 Form1.DisplayError(error);
             }
