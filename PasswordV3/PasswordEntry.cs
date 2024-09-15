@@ -5,10 +5,7 @@ using System.Text;
 using System.Security.Cryptography;
 using System.IO;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Threading;
-using System.Linq;
-using System.Reflection.Metadata.Ecma335;
+using System.Reflection;
 
 namespace Password
 {
@@ -30,45 +27,10 @@ namespace Password
 		private ulong _id;
 		private static List<ulong> _takenIDs = null;
 		private static Random _rng = null;
-		/// <summary>
-		/// Be very careful when touching this as it can result in data loss.
-		/// </summary>
-		protected void NewID()
-		{
-			if (_rng == null)
-				_rng = new Random();
-			if (_takenIDs == null)
-				_takenIDs = new List<ulong>();
-			ulong potentialID = 0;
-			byte[] bytes = new byte[8];
-			while (true)
-			{
-				_rng.NextBytes(bytes);
-				potentialID = BitConverter.ToUInt64(bytes);
-				if (potentialID == 0)
-					continue;
-				if (!_takenIDs.Contains(potentialID))
-					break;
-			}
-			_takenIDs.Add(potentialID);
-			_id = potentialID;
-		}
-		/// <summary>
-		/// Be very careful when touching this as it can result in data loss.
-		/// </summary>
-		protected void SetID(ulong id)
-		{
-			if(_takenIDs == null)
-				_takenIDs = new List<ulong>();
-			if (id == 0)
-				throw new ArgumentException("0 is not a valid argument", nameof(id));
-			if (_takenIDs.Contains(id))
-				throw new CriticalErrorException("Two files have the same ID, probably caused by making files before old files were loaded. Do not continue running or risk overwriting data.");
-			if (_takenIDs.Contains(_id))
-				_takenIDs.Remove(_id);
-			_takenIDs.Add(id);
-			_id = id;
-		}
+		private static bool classesLoaded = false;
+		private static Dictionary<FileType, Type> enumKey = new Dictionary<FileType, Type>();
+		private static Dictionary<Type, FileType> typeKey = new Dictionary<Type, FileType>();
+		private static Dictionary<Type, PropertyInfo[]> propertiesToSave = new Dictionary<Type, PropertyInfo[]>();
 		/// <summary>
 		/// Path of the file containing the encrypted <see cref="PasswordEntry"/>.
 		/// </summary>
@@ -175,7 +137,11 @@ namespace Password
 			if (File.Exists(Filename))
 				File.Delete(Filename);
 		}
-		protected abstract string GetFileContent();
+		private string GetFileContent()
+		{
+			LoadClasses();
+			return null;
+		}
 		protected string ToBase64(string text)
 		{
 			if (string.IsNullOrEmpty(text))
@@ -190,6 +156,46 @@ namespace Password
 			byte[] bytes = Convert.FromBase64String(encodedString);
 			return Encoding.UTF8.GetString(bytes);
 		}
+		/// <summary>
+		/// Be very careful when touching this as it can result in data loss.
+		/// </summary>
+		protected void NewID()
+		{
+			if (_rng == null)
+				_rng = new Random();
+			if (_takenIDs == null)
+				_takenIDs = new List<ulong>();
+			ulong potentialID = 0;
+			byte[] bytes = new byte[8];
+			while (true)
+			{
+				_rng.NextBytes(bytes);
+				potentialID = BitConverter.ToUInt64(bytes);
+				if (potentialID == 0)
+					continue;
+				if (!_takenIDs.Contains(potentialID))
+					break;
+			}
+			_takenIDs.Add(potentialID);
+			_id = potentialID;
+		}
+		/// <summary>
+		/// Be very careful when touching this as it can result in data loss.
+		/// </summary>
+		protected void SetID(ulong id)
+		{
+			if (_takenIDs == null)
+				_takenIDs = new List<ulong>();
+			if (id == 0)
+				throw new ArgumentException("0 is not a valid argument", nameof(id));
+			if (_takenIDs.Contains(id))
+				throw new CriticalErrorException("Two files have the same ID, probably caused by making files before old files were loaded. Do not continue running or risk overwriting data.");
+			if (_takenIDs.Contains(_id))
+				_takenIDs.Remove(_id);
+			_takenIDs.Add(id);
+			_id = id;
+		}
+
 		protected byte[] Encrypt(string toBeEncrypted)
 		{
 			if (toBeEncrypted == null)
@@ -231,6 +237,40 @@ namespace Password
 			}
 			return result;
 		}
+		public static void LoadClasses()
+		{
+			if(classesLoaded)
+				return;
+			classesLoaded = true;
+			Type localType = typeof(EncryptedFile);
+			Assembly ass = Assembly.GetAssembly(localType);
+			Type[] ttt = ass.GetTypes();
+			List<PropertyInfo> properties;
+			PropertyIDAttribute id;
+			ClassTypeAttribute attribute = null;
+			for (int i = 0; i < ttt.Length; i++)
+			{
+				if (!ttt[i].IsSubclassOf(typeof(EncryptedFile)))
+					continue;
+				attribute = ttt[i].GetCustomAttribute<ClassTypeAttribute>();
+				if (attribute == null)
+					throw new MissingAttributeException($"type {ttt[i].Name} is missing attribute ClassType",
+						typeof(ClassTypeAttribute), ttt[i]);
+				enumKey.Add(attribute.FileType, ttt[i]);
+				typeKey.Add(ttt[i],attribute.FileType);
+				properties = new();
+				PropertyInfo[] infos = ttt[i].GetProperties();
+				for (int j = 0; j < infos.Length; j++)
+				{
+					id = infos[j].GetCustomAttribute<PropertyIDAttribute>();
+					if(id == null)
+						continue;
+					properties.Add(infos[j]);
+				}
+				properties.Sort((o, n) => o.GetCustomAttribute<PropertyIDAttribute>().ID.CompareTo(n.GetCustomAttribute<PropertyIDAttribute>().ID));
+				propertiesToSave.Add(ttt[i], properties.ToArray());
+			}
+		}
 	}
 	/// <summary>
 	/// Class inherited from <see cref="EncryptedFile"/> contains properties and fields for storing passwords.
@@ -241,6 +281,7 @@ namespace Password
 		/// <summary>
 		/// The account name for the account.
 		/// </summary>
+		[PropertyID(2)]
 		public string AccountName
 		{
 			get { return accountName; }
@@ -249,6 +290,7 @@ namespace Password
 		/// <summary>
 		/// The email for the account.
 		/// </summary>
+		[PropertyID(3)]
 		public string Email
 		{
 			get { return email; }
@@ -257,6 +299,7 @@ namespace Password
 		/// <summary>
 		/// The domain name for the service. Leave as <see cref="null"/> when not applicable. 
 		/// </summary>
+		[PropertyID(4)]
 		public Uri Domain
 		{
 			get
@@ -276,6 +319,7 @@ namespace Password
 		/// <summary>
 		/// The name of the service.
 		/// </summary>
+		[PropertyID(0)]
 		public string Service
 		{
 			get { return service; }
@@ -284,6 +328,7 @@ namespace Password
 		/// <summary>
 		/// The password.
 		/// </summary>
+		[PropertyID(1)]
 		public string Password
 		{
 			get { return password; }
@@ -397,10 +442,6 @@ namespace Password
 					return false;
 			return true;
 		}
-		protected override string GetFileContent()
-		{
-			return $"{ToBase64(password)}\0{ToBase64(service)}\0{ToBase64(Domain.ToString())}\0{ToBase64(accountName)}\0{ToBase64(email)}";
-		}
 	}
 	/// <summary>
 	/// Class inherited from <see cref="EncryptedFile"/>, used to store plain text.
@@ -423,18 +464,11 @@ namespace Password
 			Title = FromBase64(encodedStrings[0]);
 			Text = FromBase64(encodedStrings[1]);
 		}
-		protected override string GetFileContent()
-		{
-			string result = "";
-			result += ToBase64(Title) + '\0';
-			result += ToBase64(Text);
-			return result;
-		}
 	}
 	/// <summary>
 	/// Not implemented yet
 	/// </summary>
-	[ClassType(FileType.MetaFile)]	
+	[ClassType(FileType.MetaFile)]
 	public class MetaEntry : EncryptedFile
 	{
 		public MetaEntry(byte[] key) : base(key)
@@ -446,10 +480,6 @@ namespace Password
 
 		}
 		public override FileType FileType {get { return FileType.MetaFile; } }
-		protected override string GetFileContent()
-		{
-			throw new NotImplementedException();
-		}
 	}
 	/// <summary>
 	/// Class inherited from <see cref="EncryptedFile"/>, used to ecrypt and store files of any kind.
@@ -479,13 +509,6 @@ namespace Password
 			_aes = GenerateAES(Convert.FromBase64String(strings[0]));
 			_aes.IV = Convert.FromBase64String(strings[1]);
 			_filename = strings[2];
-		}
-		protected override string GetFileContent()
-		{
-			string result = Convert.ToBase64String(_aes.Key) + '\0';
-			result += Convert.ToBase64String(_aes.IV) + '\0';
-			result += _filename;
-			return result;
 		}
 		public override void Save()
 		{
