@@ -139,8 +139,22 @@ namespace Password
 		}
 		private string GetFileContent()
 		{
+			string result = "";
 			LoadClasses();
-
+			PropertyInfo[] infos;
+			if (!propertiesToSave.ContainsKey(GetType()))
+				throw new MissingAttributeException("Missing attribute", typeof(ClassTypeAttribute), GetType());
+			infos = propertiesToSave[GetType()];
+			foreach (PropertyInfo info in infos)
+			{
+				object ob = info.GetValue(this, null);
+				Type objectType = ob.GetType();
+				if (objectType == typeof(string))
+				{
+					result += TextToBase64(ob as string);
+					continue;
+				}
+			}
 			return null;
 		}
 		protected string TextToBase64(string text)
