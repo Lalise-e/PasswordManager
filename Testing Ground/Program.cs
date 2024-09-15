@@ -1,16 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using Password;
 
 namespace rofl
 {
-   class Program
-   {
-      public static void Main()
-		{
-			EncryptedFile.LoadClasses();
-		}
-
-	}
+    class Program
+    {
+        public static void Main()
+        {
+            Console.WriteLine("lmao nerd");
+        }
+    }
 }
