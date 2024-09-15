@@ -8,7 +8,16 @@ namespace Password
 	{
 		public CriticalErrorException(string message) : base(message)
 		{
-
+		}
+	}
+	public class MissingAttributeException : Exception
+	{
+		public Type MissingAttribute;
+		public Type Class;
+		public MissingAttributeException(string message, Type missingAttribute = null, Type @class = null) : base(message)
+		{
+			MissingAttribute = missingAttribute;
+			Class = @class;
 		}
 	}
 }
