@@ -10,10 +10,10 @@ namespace Password
 			FileType = type;
 		}
 	}
-	internal class ProperyIDAttribute : Attribute
+	internal class PropertyIDAttribute : Attribute
 	{
 		internal int ID { get; set; }
-		internal ProperyIDAttribute(int iD)
+		internal PropertyIDAttribute(int iD)
 		{
 			ID = iD;
 		}
