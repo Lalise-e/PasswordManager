@@ -6,6 +6,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Drawing;
 using System.Diagnostics;
+using System.Collections.Generic;
 
 namespace Manager
 {
@@ -17,6 +18,9 @@ namespace Manager
 		private string SettingsFile { get { return $"{Directory.GetCurrentDirectory()}\\settings.json"; } }
 		private string EntryDirectory { get; set; } = $"{Directory.GetCurrentDirectory()}\\Entries";
 		private string MasterPassword { get; set; }
+		private List<PasswordEntry> PasswordEntries { get; set; }
+		private List<TextEntry> TextEntries { get; set; }
+		private List<FileEntry> FileEntries { get; set; }
 		public Form1()
 		{
 			InitializeComponent();
@@ -26,7 +30,7 @@ namespace Manager
 		{
 			Directory.CreateDirectory(EntryDirectory);
 			Directory.CreateDirectory(BackgroundDirectory);
-			PasswordEntry.EntryDirectory = EntryDirectory;
+			EncryptedFile.FileDirectory = EntryDirectory;
 			if (File.Exists(SettingsFile))
 			{
 				settings = Settings.GetSettings(SettingsFile);
@@ -47,7 +51,7 @@ namespace Manager
 			}
 			try { PasswordPatcher.OneToTwoPatcher(EntryDirectory, GetHash(MasterPassword)); }
 			catch (CryptographicException) { DisplayError("Wrong master password."); Environment.Exit(0); }
-			LoadListItems();
+			LoadEncryptedFiles();
 		}
 		private void ToolStripMenuItemIncognito_Click(object sender, EventArgs e)
 		{
@@ -88,40 +92,42 @@ namespace Manager
 		}
 		private void ToolStripMenuItemPassword_Click(object sender, EventArgs e)
 		{
-			string newPassword = null;
-			using (PasswordChanger changer = new())
+			throw new NotImplementedException();
+		}
+		private void LoadEncryptedFiles()
+		{
+			PasswordEntries = new();
+			TextEntries = new();
+			FileEntries = new();
+			string[] paths = Directory.GetFiles(EntryDirectory);
+			EncryptedFile ef;
+			for (int i = 0; i < paths.Length; i++)
 			{
-				changer.Tag = MasterPassword;
-				DialogResult dialogResult = changer.ShowDialog();
-				if (dialogResult != DialogResult.OK)
-					return;
-				newPassword = changer.Tag.ToString();
-			}
-			string[] files = Directory.GetFiles(EntryDirectory);
-			foreach (string file in files)
-			{
-				if (!File.Exists(file))
-					continue;
-				PasswordEntry oldEntry = null;
-				try { oldEntry = new(GetHash(MasterPassword), file); }
-				catch
+				try
 				{
-					DisplayError($"File: {file} is corrupt.{Environment.NewLine} Either that or I suck at coding, no idea which it is.");
-					File.Delete(file);
+					ef = EncryptedFile.GetFile(GetHash(MasterPassword), paths[i]);
+				}
+				catch (CryptographicException) { DisplayError("Wrong master password."); Environment.Exit(0); return; }
+				catch (FileNotFoundException e) { DisplayError($"File {e.FileName} not found."); continue; }
+				catch (FileLoadException e) { DisplayError($"File {e.FileName} was corrupt"); continue; }
+				catch (Exception e) { DisplayError(e); continue; }
+				if (ef.GetType() == typeof(PasswordEntry))
+				{
+					PasswordEntries.Add(ef as  PasswordEntry);
 					continue;
 				}
-				PasswordEntry newEntry = new(GetHash(newPassword))
+				if(ef.GetType() == typeof(TextEntry))
 				{
-					Password = oldEntry.Password,
-					Domain = oldEntry.Domain,
-					Service = oldEntry.Service,
-					AccountName = oldEntry.AccountName
-				};
-				oldEntry.Delete();
-				newEntry.Save();
+					TextEntries.Add(ef as TextEntry);
+					continue;
+				}
+				if(ef.GetType() == typeof(FileEntry))
+				{
+					FileEntries.Add(ef as FileEntry);
+					continue;
+				}
 			}
-			MasterPassword = newPassword;
-			LoadListItems();
+			LoadPasswordList();
 		}
 		#region PasswordStuff
 		private void ListViewEntries_ItemActivate(object sender, EventArgs e)
@@ -140,6 +146,7 @@ namespace Manager
 		}
 		private void ButtonEdit_Click(object sender, EventArgs e)
 		{
+			throw new NotImplementedException();
 			PasswordEntry entry;
 			try { entry = GetActiveEntry(); }
 			catch { return; }
@@ -150,7 +157,7 @@ namespace Manager
 				{
 					if (maker.Entry.Filename != entry.Filename)
 						entry.Delete();
-					LoadListItems();
+					LoadPasswordList();
 				}
 			}
 		}
@@ -161,7 +168,7 @@ namespace Manager
 			catch { return; }
 			entry.Delete();
 			ClearInfo();
-			LoadListItems();
+			LoadEncryptedFiles();
 		}
 		private void buttonCopy_Click(object sender, EventArgs e)
 		{
@@ -211,27 +218,18 @@ namespace Manager
 			textBoxInfoPassword.Text = entry.Password;
 			textBoxInfoService.Text = entry.Service;
 		}
-		private void LoadListItems()
+		private void LoadPasswordList()
 		{
 			listViewEntries.Items.Clear();
-			foreach (string path in Directory.GetFiles(EntryDirectory))
+			foreach (PasswordEntry entry in PasswordEntries)
 			{
-				PasswordEntry entry;
 				ListViewItem item;
-				try
+				item = new()
 				{
-					entry = new(GetHash(MasterPassword), path);
-					item = new()
-					{
-						Text = entry.Service,
-						Tag = entry,
-					};
-					item.SubItems.Add(entry.AccountName);
-				}
-				catch (CryptographicException) { DisplayError("Wrong master password."); Environment.Exit(0); return; }
-				catch (FileNotFoundException e) { DisplayError($"File {e.FileName} not found."); continue; }
-				catch (FileLoadException e) { DisplayError($"File {e.FileName} was corrupt"); continue; }
-				catch (Exception e) { DisplayError(e); continue; }
+					Text = entry.Service,
+					Tag = entry,
+				};
+				item.SubItems.Add(entry.AccountName);
 				listViewEntries.Items.Add(item);
 			}
 		}
