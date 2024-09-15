@@ -19,7 +19,6 @@ namespace Password
 		/// The directory where an <see cref="EncryptedFile"/> and its derived classes will be saved when using the <see cref="Save()"/> method.
 		/// </summary>
 		public static string FileDirectory { get; set; }
-		public abstract FileType FileType { get; }
 		/// <summary>
 		/// ID of the <see cref="EncryptedFile"/>.
 		/// </summary>
@@ -127,7 +126,7 @@ namespace Password
 		{
 			List<byte> byteList = new();
 			string content = GetFileContent();
-			byte[] encrypted = Encrypt((int)FileType + content);
+			byte[] encrypted = Encrypt((int)typeKey[GetType()] + content);
 			byteList = new(myAes.IV);
 			byteList.AddRange(encrypted);
 			if(!Directory.Exists(FileDirectory))
@@ -374,9 +373,6 @@ namespace Password
 		private string domain { get; set; } = null;
 		private string service { get; set; }
 		private string password { get; set; }
-
-		public override FileType FileType { get { return FileType.PasswordFile; } }
-
 		public PasswordEntry(byte[] key) : base(key)
 		{
 
@@ -480,7 +476,6 @@ namespace Password
 		public string Text { get; set; }
 		[PropertyID(1)]
 		public string Title { get; set; }
-		public override FileType FileType { get { return FileType.TextFile; } }
 		public TextEntry(byte[] key) : base(key)
 		{
 
@@ -504,7 +499,6 @@ namespace Password
 		{
 
 		}
-		public override FileType FileType {get { return FileType.MetaFile; } }
 	}
 	/// <summary>
 	/// Class inherited from <see cref="EncryptedFile"/>, used to ecrypt and store files of any kind.
@@ -536,7 +530,6 @@ namespace Password
 		private string _filename;
 		private string _path { get { return $"{_subPath}\\{Convert.ToHexString(BitConverter.GetBytes(ID))}.dump"; } }
 		private string _subPath { get { return $"{FileDirectory}\\Files"; } }
-		public override FileType FileType { get{ return FileType.GenericFile; } }
 		public FileEntry(byte[] key) : base(key)
 		{
 			byte[] hiddenKey = new byte[32];
