@@ -157,6 +157,22 @@ namespace Password
 			byte[] bytes = Convert.FromBase64String(encodedString);
 			return Encoding.UTF8.GetString(bytes);
 		}
+		protected string ByteArrayToBase64(byte[] bytes)
+		{
+			string result = "";
+			if (bytes == null)
+				return result;
+			if(bytes.Length == 0)
+				return result;
+			result = Convert.ToBase64String(bytes);
+			return result;
+		}
+		protected byte[] Base64ToByteArray(string text)
+		{
+			if(string.IsNullOrEmpty(text))
+				return new byte[0];
+			return Convert.FromBase64String(text);
+		}
 		/// <summary>
 		/// Be very careful when touching this as it can result in data loss.
 		/// </summary>
