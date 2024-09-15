@@ -140,16 +140,17 @@ namespace Password
 		private string GetFileContent()
 		{
 			LoadClasses();
+
 			return null;
 		}
-		protected string ToBase64(string text)
+		protected string TextToBase64(string text)
 		{
 			if (string.IsNullOrEmpty(text))
 				return "";
 			byte[] bytes = Encoding.UTF8.GetBytes(text);
 			return Convert.ToBase64String(bytes);
 		}
-		protected string FromBase64(string encodedString)
+		protected string Base64ToText(string encodedString)
 		{
 			if (string.IsNullOrEmpty(encodedString))
 				return "";
@@ -349,14 +350,14 @@ namespace Password
 		internal PasswordEntry(Aes aes, string content) : base(aes, content)
 		{
 			string[] fields = content.Split('\0');
-			password = FromBase64(fields[0]);
-			service = FromBase64(fields[1]);
+			password = Base64ToText(fields[0]);
+			service = Base64ToText(fields[1]);
 			if (fields[2].Length != 0)
-				domain = FromBase64(fields[2]);
+				domain = Base64ToText(fields[2]);
 			else
 				domain = null;
-			accountName = FromBase64(fields[3]);
-			email = FromBase64(fields[4]);
+			accountName = Base64ToText(fields[3]);
+			email = Base64ToText(fields[4]);
 		}
 
 		/// <summary>
@@ -461,8 +462,8 @@ namespace Password
 		internal TextEntry(Aes aes, string content) : base(aes, content)
 		{
 			string[] encodedStrings = content.Split('\0', StringSplitOptions.None);
-			Title = FromBase64(encodedStrings[0]);
-			Text = FromBase64(encodedStrings[1]);
+			Title = Base64ToText(encodedStrings[0]);
+			Text = Base64ToText(encodedStrings[1]);
 		}
 	}
 	/// <summary>
@@ -496,8 +497,13 @@ namespace Password
 		}
 
 		public string FileSource { get; set; }
+		/// <summary>
+		/// DO NOT TOUCH!!!<br></br>
+		/// THIS IS ONLY EXPOSED BECAUSE I AM A TALENTLESS HACK.<br></br>
+		/// DO NOT TOUCH!!!
+		/// </summary>
 		[PropertyID(1)]
-		internal Aes innerAes
+		public Aes InnerAes
 		{
 			get { return _aes; }
 			set { _aes = value; }
