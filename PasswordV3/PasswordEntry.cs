@@ -449,11 +449,9 @@ namespace Password
 	[ClassType(FileType.TextFile)]
 	public class TextEntry : EncryptedFile
 	{
-		public string EncryptedFileName { get { return _encryptedName; } }
 		public string Text { get; set; }
 		public string Title { get; set; }
 		public override FileType FileType { get { return FileType.TextFile; } }
-		private string _encryptedName;
 		public TextEntry(byte[] key) : base(key)
 		{
 
