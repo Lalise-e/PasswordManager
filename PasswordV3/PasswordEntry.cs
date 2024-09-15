@@ -59,6 +59,19 @@ namespace Password
 		protected EncryptedFile(Aes aes, string content)
 		{
 			myAes = aes;
+			Type localType = GetType();
+			PropertyInfo[] Infos = propertiesToSave[localType];
+			string[] encodedProperties = content.Split('\0');
+			for (int i = 0; i < Infos.Length; i++)
+			{
+				PropertyInfo info = Infos[i];
+				Type pType = info.PropertyType;
+				if(pType == typeof(string))
+				{
+					info.SetValue(this, Base64ToText(encodedProperties[i]));
+					continue;
+				}
+			}
 		}
 		/// <summary>
 		/// Generates an <see cref="Aes"/>.
@@ -86,7 +99,8 @@ namespace Password
 		/// <param name="path">Directory where the files containing the enrypted data are located.</param>
 		public static EncryptedFile GetFile(byte[] key, string path)
 		{
-			EncryptedFile result = null;
+			LoadClasses();
+			EncryptedFile? result = null;
 			Aes aes = GenerateAES(key);
 			byte[] rawData = File.ReadAllBytes(path);
 			aes.IV = rawData[0..16];
@@ -96,20 +110,9 @@ namespace Password
 				ft = (FileType)intType;
 			else
 				throw new IOException("Invalid file format, the string needs to lead with a number");
-			switch (ft)
-			{
-				case FileType.PasswordFile:
-					result = new PasswordEntry(aes, rawString[1..]);
-					break;
-				case FileType.TextFile:
-					result = new TextEntry(aes, rawString[1..]);
-					break;
-				case FileType.GenericFile:
-					result = new FileEntry(aes, rawString[1..]);
-					break;
-				default:
-					throw new NotImplementedException($"filetype {ft} is not supported");
-			}
+			ConstructorInfo cInfo = enumKey[ft].GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance,
+				null, new Type[] { typeof(Aes), typeof(string) }, null);
+			result = cInfo.Invoke(new object[] { aes, rawString[1..] }) as EncryptedFile;
 			string name = Path.GetFileNameWithoutExtension(path);
 			if (ulong.TryParse(name, out ulong id))
 				result.SetID(id);
@@ -127,6 +130,8 @@ namespace Password
 			byte[] encrypted = Encrypt((int)FileType + content);
 			byteList = new(myAes.IV);
 			byteList.AddRange(encrypted);
+			if(!Directory.Exists(FileDirectory))
+				Directory.CreateDirectory(FileDirectory);
 			File.WriteAllBytes(Filename, byteList.ToArray());
 		}
 		/// <summary>
@@ -151,11 +156,11 @@ namespace Password
 				Type objectType = ob.GetType();
 				if (objectType == typeof(string))
 				{
-					result += TextToBase64(ob as string);
+					result += TextToBase64(ob as string) + '\0';
 					continue;
 				}
 			}
-			return null;
+			return result;
 		}
 		protected string TextToBase64(string text)
 		{
@@ -226,7 +231,6 @@ namespace Password
 			_takenIDs.Add(id);
 			_id = id;
 		}
-
 		protected byte[] Encrypt(string toBeEncrypted)
 		{
 			if (toBeEncrypted == null)
@@ -379,15 +383,7 @@ namespace Password
 		}
 		internal PasswordEntry(Aes aes, string content) : base(aes, content)
 		{
-			string[] fields = content.Split('\0');
-			password = Base64ToText(fields[0]);
-			service = Base64ToText(fields[1]);
-			if (fields[2].Length != 0)
-				domain = Base64ToText(fields[2]);
-			else
-				domain = null;
-			accountName = Base64ToText(fields[3]);
-			email = Base64ToText(fields[4]);
+
 		}
 
 		/// <summary>
@@ -489,11 +485,9 @@ namespace Password
 		{
 
 		}
-		internal TextEntry(Aes aes, string content) : base(aes, content)
+		internal TextEntry(Aes aes, string text) : base(aes, text)
 		{
-			string[] encodedStrings = content.Split('\0', StringSplitOptions.None);
-			Title = Base64ToText(encodedStrings[0]);
-			Text = Base64ToText(encodedStrings[1]);
+
 		}
 	}
 	/// <summary>
@@ -552,10 +546,7 @@ namespace Password
 		}
 		internal FileEntry(Aes aes, string content) : base(aes, content)
 		{
-			string[] strings = content.Split('\0');
-			_aes = GenerateAES(Convert.FromBase64String(strings[0]));
-			_aes.IV = Convert.FromBase64String(strings[1]);
-			_filename = strings[2];
+
 		}
 		public override void Save()
 		{
