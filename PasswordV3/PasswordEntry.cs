@@ -449,7 +449,9 @@ namespace Password
 	[ClassType(FileType.TextFile)]
 	public class TextEntry : EncryptedFile
 	{
+		[PropertyID(0)]
 		public string Text { get; set; }
+		[PropertyID(1)]
 		public string Title { get; set; }
 		public override FileType FileType { get { return FileType.TextFile; } }
 		public TextEntry(byte[] key) : base(key)
@@ -486,9 +488,20 @@ namespace Password
 	[ClassType(FileType.GenericFile)]	
 	public class FileEntry : EncryptedFile
 	{
-		public string OriginalFileName { get { return _filename; } }
+		[PropertyID(0)]
+		public string OriginalFileName
+		{
+			get { return _filename; }
+			set { _filename = value; }
+		}
 
 		public string FileSource { get; set; }
+		[PropertyID(1)]
+		internal Aes innerAes
+		{
+			get { return _aes; }
+			set { _aes = value; }
+		}
 		private Aes _aes;
 		private string _filename;
 		private string _path { get { return $"{_subPath}\\{Convert.ToHexString(BitConverter.GetBytes(ID))}.dump"; } }
