@@ -10,7 +10,7 @@ using System.Threading;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 
-namespace Password_wip
+namespace Password
 {
 	/// <summary>
 	/// Abstract class used for managing various types of encrypted files.
@@ -235,6 +235,7 @@ namespace Password_wip
 	/// <summary>
 	/// Class inherited from <see cref="EncryptedFile"/> contains properties and fields for storing passwords.
 	/// </summary>
+	[ClassType(FileType.PasswordFile)]
 	public class PasswordEntry : EncryptedFile
 	{
 		/// <summary>
@@ -404,6 +405,7 @@ namespace Password_wip
 	/// <summary>
 	/// Class inherited from <see cref="EncryptedFile"/>, used to store plain text.
 	/// </summary>
+	[ClassType(FileType.TextFile)]
 	public class TextEntry : EncryptedFile
 	{
 		public string EncryptedFileName { get { return _encryptedName; } }
@@ -432,6 +434,7 @@ namespace Password_wip
 	/// <summary>
 	/// Not implemented yet
 	/// </summary>
+	[ClassType(FileType.MetaFile)]	
 	public class MetaEntry : EncryptedFile
 	{
 		public MetaEntry(byte[] key) : base(key)
@@ -452,6 +455,7 @@ namespace Password_wip
 	/// Class inherited from <see cref="EncryptedFile"/>, used to ecrypt and store files of any kind.
 	/// Saves the encrypted file in a sub directory in <see cref="EncryptedFile.FileDirectory"/>.
 	/// </summary>
+	[ClassType(FileType.GenericFile)]	
 	public class FileEntry : EncryptedFile
 	{
 		public string OriginalFileName { get { return _filename; } }
@@ -537,21 +541,6 @@ namespace Password_wip
 			}
 			locationStream.Close();
 			locationStream.Dispose();
-		}
-	}
-	public enum FileType
-	{
-		PasswordFile = 0,
-		TextFile = 1,
-		MetaFile = 2,
-		GenericFile = 3,
-		OtherFile = 4
-	}
-	public class CriticalErrorException : Exception
-	{
-		public CriticalErrorException(string message) : base(message)
-		{
-
 		}
 	}
 }
