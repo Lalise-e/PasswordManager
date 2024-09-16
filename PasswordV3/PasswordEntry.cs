@@ -169,7 +169,7 @@ namespace Password
 					result += TextToBase64(ob as string);
 					continue;
 				}
-				if(objectType == typeof(Aes))
+				if (typeof(Aes).IsAssignableFrom(objectType))
 				{
 					result += AesToBase64(ob as Aes);
 					continue;
@@ -212,14 +212,15 @@ namespace Password
 		{
 			string result = "";
 			result += ByteArrayToBase64(aes.IV);
+			result += (char)0x01;
 			result += ByteArrayToBase64(aes.Key);
 			return result;
 		}
 		protected Aes Base64ToAes(string text)
 		{
-			byte[] temp = Base64ToByteArray(text);
-			Aes result = GenerateAES(temp[16..]);
-			result.IV = temp[..16];
+			string[] temp = text.Split((char)0x01);
+			Aes result = GenerateAES(Base64ToByteArray(temp[1]));
+			result.IV = Base64ToByteArray(temp[0]);
 			return result;
 		}
 		/// <summary>
@@ -664,7 +665,7 @@ namespace Password
 		/// <param name="exportLocation">The location that the file will be saved in</param>
 		public void Export(string exportLocation)
 		{
-			if (!Path.HasExtension(exportLocation))
+			if (!Path.HasExtension(exportLocation) || Directory.Exists(exportLocation))
 			{
 				if (Path.EndsInDirectorySeparator(exportLocation))
 					exportLocation += OriginalFileName;
