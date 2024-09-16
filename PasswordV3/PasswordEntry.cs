@@ -70,6 +70,11 @@ namespace Password
 					info.SetValue(this, Base64ToText(encodedProperties[i]));
 					continue;
 				}
+				if(pType == typeof(Aes))
+				{
+					info.SetValue(this, Base64ToAes(encodedProperties[i]));
+					continue;
+				}
 				throw new UnhandledTypeException("Decoding for type is not handled.", pType);
 			}
 		}
@@ -164,6 +169,11 @@ namespace Password
 					result += TextToBase64(ob as string);
 					continue;
 				}
+				if(objectType == typeof(Aes))
+				{
+					result += AesToBase64(ob as Aes);
+					continue;
+				}
 				throw new UnhandledTypeException("Encoding for type is not handled.", objectType);
 			}
 			return result;
@@ -197,6 +207,20 @@ namespace Password
 			if(string.IsNullOrEmpty(text))
 				return new byte[0];
 			return Convert.FromBase64String(text);
+		}
+		protected string AesToBase64(Aes aes)
+		{
+			string result = "";
+			result += ByteArrayToBase64(aes.IV);
+			result += ByteArrayToBase64(aes.Key);
+			return result;
+		}
+		protected Aes Base64ToAes(string text)
+		{
+			byte[] temp = Base64ToByteArray(text);
+			Aes result = GenerateAES(temp[16..]);
+			result.IV = temp[..16];
+			return result;
 		}
 		/// <summary>
 		/// Be very careful when touching this as it can result in data loss.
