@@ -23,7 +23,7 @@ namespace Password
 	public class UnhandledTypeException : Exception
 	{
 		public Type unhandledType { get; set; }
-		public UnhandledTypeException(string message, Type type)
+		public UnhandledTypeException(string message, Type type) : base(message)
 		{
 			unhandledType = type;
 		}
