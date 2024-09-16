@@ -538,13 +538,18 @@ namespace Password
 	[ClassType(FileType.GenericFile)]	
 	public class FileEntry : EncryptedFile
 	{
+		/// <summary>
+		/// The name of the encrypted file.
+		/// </summary>
 		[PropertyID(0)]
 		public string OriginalFileName
 		{
 			get { return _filename; }
 			set { _filename = value; }
 		}
-
+		/// <summary>
+		/// The file that will be encrypted.
+		/// </summary>
 		public string FileSource { get; set; }
 		[PropertyID(1)]
 		internal Aes InnerAes
@@ -553,6 +558,10 @@ namespace Password
 			set { _aes = value; }
 		}
 		private Aes _aes;
+		[PropertyID(2)]
+		public string OriginalSize { get; set; }
+		[PropertyID(3)]
+		public string EncryptedSize { get; set; }
 		private string _filename;
 		private string _path { get { return $"{_subPath}\\{Convert.ToHexString(BitConverter.GetBytes(ID))}.dump"; } }
 		private string _subPath { get { return $"{FileDirectory}\\Files"; } }
@@ -567,8 +576,65 @@ namespace Password
 		{
 
 		}
-		public override void Save()
+		public override void Delete()
 		{
+			if(File.Exists(_path))
+				File.Delete(_path);
+			base.Delete();
+		}
+		public static string GetFileSize(string file)
+		{
+			string result = "";
+			string prefix = "B";
+			double divisor = 1;
+			long length = new FileInfo(file).Length;
+			double exponent = Math.Log2(length);
+			if (exponent < 10) ;
+			else if (exponent < 20)
+			{
+				divisor = Math.Pow(2, 10);
+				prefix = "k" + prefix;
+			}
+			else if (exponent < 30)
+			{
+				divisor = Math.Pow(2, 20);
+				prefix = "M" + prefix;
+			}
+			else if (exponent < 40)
+			{
+				divisor = Math.Pow(2, 30);
+				prefix = "G" + prefix;
+			}
+			else if (exponent < 50)
+			{
+				divisor = Math.Pow(2, 40);
+				prefix = "T" + prefix;
+			}
+			else if (exponent < 60)
+			{
+				divisor = Math.Pow(2, 50);
+				prefix = "P" + prefix;
+			}
+			else if (exponent < 70)
+			{
+				divisor = Math.Pow(2, 60);
+				prefix = "E" + prefix;
+			}
+			result = string.Format("{1} {0:00}", prefix, Math.Round(length / divisor, 2));
+			return result;
+		}
+		/// <summary>
+		/// Encrypts <see cref="FileSource"/>.
+		/// </summary>
+		public void Import() => Import(FileSource);
+		/// <summary>
+		/// Encrypts the target file.
+		/// </summary>
+		/// <param name="src">The source file to be encrypted, also sets <see cref="FileSource"/> to be this.</param>
+		/// <exception cref="FileNotFoundException"></exception>
+		public void Import(string src)
+		{
+			FileSource = src;
 			if (!File.Exists(FileSource))
 				throw new FileNotFoundException("File not found", FileSource);
 			if (!Directory.Exists(_subPath))
@@ -589,13 +655,8 @@ namespace Password
 			sourceStream.Close();
 			sourceStream.Dispose();
 			_filename = Path.GetFileName(FileSource);
-			base.Save();
-		}
-		public override void Delete()
-		{
-			if(File.Exists(_path))
-				File.Delete(_path);
-			base.Delete();
+			OriginalSize = GetFileSize(FileSource);
+			EncryptedSize = GetFileSize(_path);
 		}
 		/// <summary>
 		/// Decrypts and exports the file.
