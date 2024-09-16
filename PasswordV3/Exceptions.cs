@@ -20,4 +20,12 @@ namespace Password
 			Class = @class;
 		}
 	}
+	public class UnhandledTypeException : Exception
+	{
+		public Type unhandledType { get; set; }
+		public UnhandledTypeException(string message, Type type)
+		{
+			unhandledType = type;
+		}
+	}
 }

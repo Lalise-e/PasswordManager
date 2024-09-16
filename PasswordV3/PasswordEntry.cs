@@ -70,6 +70,7 @@ namespace Password
 					info.SetValue(this, Base64ToText(encodedProperties[i]));
 					continue;
 				}
+				throw new UnhandledTypeException("Decoding for type is not handled.", pType);
 			}
 		}
 		/// <summary>
@@ -163,6 +164,7 @@ namespace Password
 					result += TextToBase64(ob as string);
 					continue;
 				}
+				throw new UnhandledTypeException("Encoding for type is not handled.", objectType);
 			}
 			return result;
 		}
