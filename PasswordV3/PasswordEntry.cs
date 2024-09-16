@@ -147,6 +147,11 @@ namespace Password
 			if (File.Exists(Filename))
 				File.Delete(Filename);
 		}
+		/// <summary>
+		/// Encodes a derived class in base64 strings where the properties are seperated by a null character.
+		/// </summary>
+		/// <exception cref="MissingAttributeException"></exception>
+		/// <exception cref="UnhandledTypeException"></exception>
 		private string GetFileContent()
 		{
 			string result = "";
@@ -303,7 +308,7 @@ namespace Password
 			}
 			return result;
 		}
-		public static void LoadClasses()
+		private static void LoadClasses()
 		{
 			if(classesLoaded)
 				return;
@@ -504,8 +509,14 @@ namespace Password
 	[ClassType(FileType.TextFile)]
 	public class TextEntry : EncryptedFile
 	{
+		/// <summary>
+		/// The text body.
+		/// </summary>
 		[PropertyID(0)]
 		public string Text { get; set; }
+		/// <summary>
+		/// The title for the text.
+		/// </summary>
 		[PropertyID(1)]
 		public string Title { get; set; }
 		public TextEntry(byte[] key) : base(key)
@@ -533,8 +544,8 @@ namespace Password
 		}
 	}
 	/// <summary>
-	/// Class inherited from <see cref="EncryptedFile"/>, used to ecrypt and store files of any kind.
-	/// Saves the encrypted file in a sub directory in <see cref="EncryptedFile.FileDirectory"/>.
+	/// Class inherited from <see cref="EncryptedFile"/> and contains methods and properties to manage an encrypted file.<br></br>
+	/// Use <see cref="Import()"/> and <see cref="Export(string)"/> to Encrypt/Decrypt target file.
 	/// </summary>
 	[ClassType(FileType.GenericFile)]	
 	public class FileEntry : EncryptedFile
@@ -559,13 +570,23 @@ namespace Password
 			set { _aes = value; }
 		}
 		private Aes _aes;
+		/// <summary>
+		/// The size of the file before it got encrypted.
+		/// </summary>
 		[PropertyID(2)]
 		public string OriginalSize { get; set; }
+		/// <summary>
+		/// The size of the encrypted file.
+		/// </summary>
 		[PropertyID(3)]
 		public string EncryptedSize { get; set; }
 		private string _filename;
 		private string _path { get { return $"{_subPath}\\{Convert.ToHexString(BitConverter.GetBytes(ID))}.dump"; } }
 		private string _subPath { get { return $"{FileDirectory}\\Files"; } }
+		/// <summary>
+		/// Creates a new instance of <see cref="FileEntry"/>.
+		/// </summary>
+		/// <param name="key">The encryption key, needs to be 32 bytes.</param>
 		public FileEntry(byte[] key) : base(key)
 		{
 			byte[] hiddenKey = new byte[32];
@@ -625,11 +646,11 @@ namespace Password
 			return result;
 		}
 		/// <summary>
-		/// Encrypts <see cref="FileSource"/>.
+		/// Encrypts <see cref="FileSource"/> and then executes <see cref="EncryptedFile.Save"/>
 		/// </summary>
 		public void Import() => Import(FileSource);
 		/// <summary>
-		/// Encrypts the target file.
+		/// Encrypts the target file and then executes <see cref="EncryptedFile.Save"/>.
 		/// </summary>
 		/// <param name="src">The source file to be encrypted, also sets <see cref="FileSource"/> to be this.</param>
 		/// <exception cref="FileNotFoundException"></exception>
@@ -660,7 +681,7 @@ namespace Password
 			EncryptedSize = GetFileSize(_path);
 		}
 		/// <summary>
-		/// Decrypts and exports the file.
+		/// Decrypts and exports the file, to target location.
 		/// </summary>
 		/// <param name="exportLocation">The location that the file will be saved in</param>
 		public void Export(string exportLocation)
