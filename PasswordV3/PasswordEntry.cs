@@ -149,13 +149,18 @@ namespace Password
 			if (!propertiesToSave.ContainsKey(GetType()))
 				throw new MissingAttributeException("Missing attribute", typeof(ClassTypeAttribute), GetType());
 			infos = propertiesToSave[GetType()];
-			foreach (PropertyInfo info in infos)
+			for (int i = 0; i < infos.Length; i++)
 			{
+				if (i != 0)
+					result += '\0';
+				PropertyInfo info = infos[i];
 				object ob = info.GetValue(this, null);
+				if (ob == null)
+					continue;
 				Type objectType = ob.GetType();
 				if (objectType == typeof(string))
 				{
-					result += TextToBase64(ob as string) + '\0';
+					result += TextToBase64(ob as string);
 					continue;
 				}
 			}
