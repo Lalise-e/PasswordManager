@@ -293,7 +293,7 @@ namespace Password
 				enumKey.Add(attribute.FileType, ttt[i]);
 				typeKey.Add(ttt[i],attribute.FileType);
 				properties = new();
-				PropertyInfo[] infos = ttt[i].GetProperties();
+				PropertyInfo[] infos = ttt[i].GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 				for (int j = 0; j < infos.Length; j++)
 				{
 					id = infos[j].GetCustomAttribute<PropertyIDAttribute>();
@@ -515,13 +515,8 @@ namespace Password
 		}
 
 		public string FileSource { get; set; }
-		/// <summary>
-		/// DO NOT TOUCH!!!<br></br>
-		/// THIS IS ONLY EXPOSED BECAUSE I AM A TALENTLESS HACK.<br></br>
-		/// DO NOT TOUCH!!!
-		/// </summary>
 		[PropertyID(1)]
-		public Aes InnerAes
+		internal Aes InnerAes
 		{
 			get { return _aes; }
 			set { _aes = value; }
