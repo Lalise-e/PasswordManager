@@ -50,11 +50,6 @@ namespace Password
 			myAes = GenerateAES(key);
 			NewID();
 		}
-		/// <summary>
-		/// This should be the same as <see cref="GetFileContent"/> but backwards.
-		/// </summary>
-		/// <param name="aes"></param>
-		/// <param name="content"></param>
 		protected EncryptedFile(Aes aes, string content)
 		{
 			myAes = aes;
@@ -73,6 +68,11 @@ namespace Password
 				if(pType == typeof(Aes))
 				{
 					info.SetValue(this, Base64ToAes(encodedProperties[i]));
+					continue;
+				}
+				if(pType == typeof(Uri))
+				{
+					info.SetValue(this, Base64ToUri(encodedProperties[i]));
 					continue;
 				}
 				throw new UnhandledTypeException("Decoding for type is not handled.", pType);
@@ -179,6 +179,11 @@ namespace Password
 					result += AesToBase64(ob as Aes);
 					continue;
 				}
+				if(objectType == typeof(Uri))
+				{
+					result = UriToBase64(ob as Uri);
+					continue;
+				}
 				throw new UnhandledTypeException("Encoding for type is not handled.", objectType);
 			}
 			return result;
@@ -227,6 +232,19 @@ namespace Password
 			Aes result = GenerateAES(Base64ToByteArray(temp[1]));
 			result.IV = Base64ToByteArray(temp[0]);
 			return result;
+		}
+		protected string UriToBase64(Uri uri)
+		{
+			string result = "";
+			if(uri == null)
+				return result;
+			return TextToBase64(uri.OriginalString);
+		}
+		protected Uri Base64ToUri(string text)
+		{
+			if (string.IsNullOrEmpty(text))
+				return null;
+			return new Uri(Base64ToText(text));
 		}
 		/// <summary>
 		/// Be very careful when touching this as it can result in data loss.
