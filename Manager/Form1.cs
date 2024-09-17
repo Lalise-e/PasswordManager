@@ -26,7 +26,7 @@ namespace Manager
 		{
 			Directory.CreateDirectory(EntryDirectory);
 			Directory.CreateDirectory(BackgroundDirectory);
-			PasswordEntry.EntryDirectory = EntryDirectory;
+			EncryptedFile.FileDirectory = EntryDirectory;
 			if (File.Exists(SettingsFile))
 			{
 				settings = Settings.GetSettings(SettingsFile);
@@ -45,9 +45,35 @@ namespace Manager
 				if (result == DialogResult.OK)
 					MasterPassword = fetcher.Password;
 			}
-			try { PasswordPatcher.OneToTwoPatcher(EntryDirectory, GetHash(MasterPassword)); }
+			try { PasswordPatcher.TwoToThreePatcher(EntryDirectory, GetHash(MasterPassword)); }
 			catch (CryptographicException) { DisplayError("Wrong master password."); Environment.Exit(0); }
 			LoadListItems();
+		}
+		private void LoadListItems()
+		{
+			//This needs a rewrite, loading all the encrypted files from storage will cause issues with IDs
+			throw new NotImplementedException();
+			listViewEntries.Items.Clear();
+			foreach (string path in Directory.GetFiles(EntryDirectory))
+			{
+				PasswordEntry entry;
+				ListViewItem item;
+				try
+				{
+					entry = EncryptedFile.GetFile(GetHash(MasterPassword), path) as PasswordEntry;
+					item = new()
+					{
+						Text = entry.Service,
+						Tag = entry,
+					};
+					item.SubItems.Add(entry.AccountName);
+				}
+				catch (CryptographicException) { DisplayError("Wrong master password."); Environment.Exit(0); return; }
+				catch (FileNotFoundException e) { DisplayError($"File {e.FileName} not found."); continue; }
+				catch (FileLoadException e) { DisplayError($"File {e.FileName} was corrupt"); continue; }
+				catch (Exception e) { DisplayError(e); continue; }
+				listViewEntries.Items.Add(item);
+			}
 		}
 		private void ToolStripMenuItemIncognito_Click(object sender, EventArgs e)
 		{
@@ -88,6 +114,8 @@ namespace Manager
 		}
 		private void ToolStripMenuItemPassword_Click(object sender, EventArgs e)
 		{
+			//This needs to be rewritten to deal with more classes
+			throw new NotImplementedException();
 			string newPassword = null;
 			using (PasswordChanger changer = new())
 			{
@@ -103,7 +131,7 @@ namespace Manager
 				if (!File.Exists(file))
 					continue;
 				PasswordEntry oldEntry = null;
-				try { oldEntry = new(GetHash(MasterPassword), file); }
+				try { oldEntry = EncryptedFile.GetFile(GetHash(MasterPassword), file) as PasswordEntry; }
 				catch
 				{
 					DisplayError($"File: {file} is corrupt.{Environment.NewLine} Either that or I suck at coding, no idea which it is.");
@@ -140,6 +168,8 @@ namespace Manager
 		}
 		private void ButtonEdit_Click(object sender, EventArgs e)
 		{
+			//LoadListItem should not be used here
+			throw new NotImplementedException();
 			PasswordEntry entry;
 			try { entry = GetActiveEntry(); }
 			catch { return; }
@@ -156,6 +186,8 @@ namespace Manager
 		}
 		private void ButtonDelete_Click(object sender, EventArgs e)
 		{
+			//This is old and needs to be updated to not be shit
+			throw new NotImplementedException();
 			PasswordEntry entry;
 			try { entry = GetActiveEntry(); }
 			catch { return; }
@@ -210,30 +242,6 @@ namespace Manager
 				textBoxInfoDomain.Text = null;
 			textBoxInfoPassword.Text = entry.Password;
 			textBoxInfoService.Text = entry.Service;
-		}
-		private void LoadListItems()
-		{
-			listViewEntries.Items.Clear();
-			foreach (string path in Directory.GetFiles(EntryDirectory))
-			{
-				PasswordEntry entry;
-				ListViewItem item;
-				try
-				{
-					entry = new(GetHash(MasterPassword), path);
-					item = new()
-					{
-						Text = entry.Service,
-						Tag = entry,
-					};
-					item.SubItems.Add(entry.AccountName);
-				}
-				catch (CryptographicException) { DisplayError("Wrong master password."); Environment.Exit(0); return; }
-				catch (FileNotFoundException e) { DisplayError($"File {e.FileName} not found."); continue; }
-				catch (FileLoadException e) { DisplayError($"File {e.FileName} was corrupt"); continue; }
-				catch (Exception e) { DisplayError(e); continue; }
-				listViewEntries.Items.Add(item);
-			}
 		}
 		private void ClearInfo()
 		{

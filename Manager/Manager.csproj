@@ -8,6 +8,6 @@
   
   <ItemGroup>
     <ProjectReference Include="..\PasswordV2\PasswordV2.csproj" />
-    <ProjectReference Include="..\Password\Password.csproj" />
+    <ProjectReference Include="..\PasswordV3\PasswordV3.csproj" />
   </ItemGroup>
 </Project>
