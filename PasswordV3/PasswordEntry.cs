@@ -181,7 +181,7 @@ namespace Password
 				}
 				if(objectType == typeof(Uri))
 				{
-					result = UriToBase64(ob as Uri);
+					result += UriToBase64(ob as Uri);
 					continue;
 				}
 				throw new UnhandledTypeException("Encoding for type is not handled.", objectType);
