@@ -130,6 +130,8 @@ namespace Password
 		/// </summary>
 		public virtual void Save()
 		{
+			if (_id == 0)
+				return;
 			List<byte> byteList = new();
 			string content = GetFileContent();
 			byte[] encrypted = Encrypt((int)typeKey[GetType()] + content);
@@ -247,9 +249,26 @@ namespace Password
 			return new Uri(Base64ToText(text));
 		}
 		/// <summary>
-		/// Be very careful when touching this as it can result in data loss.
+		/// This releases all IDs and should only be used when you know all
+		/// instances of <see cref="EncryptedFile"/> are gonna be released from memory.
 		/// </summary>
-		protected void NewID()
+		public static void ReleaseIDs()
+		{
+			_takenIDs = null;
+		}
+		/// <summary>
+		/// Releases current ID and sets it to be 0.
+		/// </summary>
+		public void ReleaseID()
+		{
+			_takenIDs.Remove(_id);
+			_id = 0;
+		}
+		/// <summary>
+		/// Be very careful when touching this as it can result in data loss.<br></br>
+		/// Generates a new random ID.
+		/// </summary>
+		public void NewID()
 		{
 			if (_rng == null)
 				_rng = new Random();
