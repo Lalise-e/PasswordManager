@@ -6,6 +6,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Drawing;
 using System.Diagnostics;
+using System.Collections.Generic;
 
 namespace Manager
 {
@@ -17,6 +18,9 @@ namespace Manager
 		private string SettingsFile { get { return $"{Directory.GetCurrentDirectory()}\\settings.json"; } }
 		private string EntryDirectory { get; set; } = $"{Directory.GetCurrentDirectory()}\\Entries";
 		private string MasterPassword { get; set; }
+		private List<PasswordEntry> PasswordEntries { get; set; } = new List<PasswordEntry>();
+		private List<TextEntry> TextEntries { get; set; } = new List<TextEntry>();
+		private List<FileEntry> FileEntries { get; set; } = new List<FileEntry>();
 		public Form1()
 		{
 			InitializeComponent();
@@ -52,27 +56,20 @@ namespace Manager
 		private void LoadListItems()
 		{
 			//This needs a rewrite, loading all the encrypted files from storage will cause issues with IDs
-			throw new NotImplementedException();
-			listViewEntries.Items.Clear();
-			foreach (string path in Directory.GetFiles(EntryDirectory))
+			string[] paths = Directory.GetFiles(EntryDirectory);
+			for (int i = 0; i < paths.Length; i++)
 			{
-				PasswordEntry entry;
-				ListViewItem item;
-				try
-				{
-					entry = EncryptedFile.GetFile(GetHash(MasterPassword), path) as PasswordEntry;
-					item = new()
-					{
-						Text = entry.Service,
-						Tag = entry,
-					};
-					item.SubItems.Add(entry.AccountName);
-				}
+				EncryptedFile file;
+				try { file = EncryptedFile.GetFile(GetHash(MasterPassword), paths[i]); }
 				catch (CryptographicException) { DisplayError("Wrong master password."); Environment.Exit(0); return; }
 				catch (FileNotFoundException e) { DisplayError($"File {e.FileName} not found."); continue; }
 				catch (FileLoadException e) { DisplayError($"File {e.FileName} was corrupt"); continue; }
 				catch (Exception e) { DisplayError(e); continue; }
-				listViewEntries.Items.Add(item);
+				if (file.GetType() == typeof(PasswordEntry))
+				{
+					AddPasswordEntry(file as PasswordEntry);
+					continue;
+				}
 			}
 		}
 		private void ToolStripMenuItemIncognito_Click(object sender, EventArgs e)
@@ -152,12 +149,42 @@ namespace Manager
 			LoadListItems();
 		}
 		#region PasswordStuff
+		private void AddPasswordEntry(PasswordEntry entry)
+		{
+			PasswordEntries.Add(entry);
+			ListViewItem item = new ListViewItem()
+			{
+				Text = entry.Service,
+				Tag = entry,
+			};
+			item.SubItems.Add(entry.AccountName);
+			listViewPasswords.Items.Add(item);
+			listViewPasswords.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
+		}
 		private void ListViewEntries_ItemActivate(object sender, EventArgs e)
 		{
 			PasswordEntry entry;
 			try { entry = GetActiveEntry(); }
 			catch { return; }
 			LoadEntry(entry);
+		}
+		/// <summary>
+		/// This is needed so the stack won't overflow when resizing the columns, just ignore it.
+		/// </summary>
+		private bool ignoreResize = false;
+		private void listViewPasswords_ColumnWidthChanging(object sender, ColumnWidthChangingEventArgs e)
+		{
+			if (ignoreResize)
+				return;
+			ignoreResize = true;
+			Debug.WriteLine(listViewPasswords.ClientSize.Width);
+			int totalWdith = listViewPasswords.ClientSize.Width, index;
+			if (e.ColumnIndex == 0)
+				index = 1;
+			else
+				index = 0;
+			listViewPasswords.Columns[index].Width = totalWdith - listViewPasswords.Columns[e.ColumnIndex].Width;
+			ignoreResize = false;
 		}
 		private void ButtonAdd_Click(object sender, EventArgs e)
 		{
@@ -252,7 +279,7 @@ namespace Manager
 		private PasswordEntry GetActiveEntry()
 		{
 			PasswordEntry entry;
-			try { entry = listViewEntries.SelectedItems[0].Tag as PasswordEntry; }
+			try { entry = listViewPasswords.SelectedItems[0].Tag as PasswordEntry; }
 			catch (ArgumentOutOfRangeException) { DisplayError("Nothing is selected."); throw new Exception(); }
 			catch (Exception) { DisplayError("Something went wrong."); throw; }
 			return entry;
@@ -270,7 +297,7 @@ namespace Manager
 					Text = $"{maker.Entry.Service} - {maker.Entry.AccountName}",
 					Tag = maker.Entry
 				};
-				listViewEntries.Items.Add(item);
+				listViewPasswords.Items.Add(item);
 			}
 			return result;
 		}

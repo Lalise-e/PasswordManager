@@ -38,7 +38,7 @@ namespace Manager
 			infoAccountLabel = new System.Windows.Forms.Label();
 			infoServiceLabel = new System.Windows.Forms.Label();
 			textBoxInfoService = new System.Windows.Forms.TextBox();
-			listViewEntries = new System.Windows.Forms.ListView();
+			listViewPasswords = new System.Windows.Forms.ListView();
 			columnHeaderService = new System.Windows.Forms.ColumnHeader();
 			columnHeaderName = new System.Windows.Forms.ColumnHeader();
 			buttonAdd = new System.Windows.Forms.Button();
@@ -161,20 +161,24 @@ namespace Manager
 			textBoxInfoService.Size = new System.Drawing.Size(252, 27);
 			textBoxInfoService.TabIndex = 0;
 			// 
-			// listViewEntries
+			// listViewPasswords
 			// 
-			listViewEntries.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] { columnHeaderService, columnHeaderName });
-			listViewEntries.LabelEdit = true;
-			listViewEntries.Location = new System.Drawing.Point(4, 5);
-			listViewEntries.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
-			listViewEntries.MultiSelect = false;
-			listViewEntries.Name = "listViewEntries";
-			listViewEntries.ShowGroups = false;
-			listViewEntries.Size = new System.Drawing.Size(416, 427);
-			listViewEntries.Sorting = System.Windows.Forms.SortOrder.Ascending;
-			listViewEntries.TabIndex = 1;
-			listViewEntries.UseCompatibleStateImageBehavior = false;
-			listViewEntries.View = System.Windows.Forms.View.Details;
+			listViewPasswords.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] { columnHeaderService, columnHeaderName });
+			listViewPasswords.ForeColor = System.Drawing.SystemColors.MenuText;
+			listViewPasswords.FullRowSelect = true;
+			listViewPasswords.LabelEdit = true;
+			listViewPasswords.Location = new System.Drawing.Point(4, 5);
+			listViewPasswords.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+			listViewPasswords.MultiSelect = false;
+			listViewPasswords.Name = "listViewPasswords";
+			listViewPasswords.ShowGroups = false;
+			listViewPasswords.Size = new System.Drawing.Size(416, 427);
+			listViewPasswords.Sorting = System.Windows.Forms.SortOrder.Ascending;
+			listViewPasswords.TabIndex = 1;
+			listViewPasswords.UseCompatibleStateImageBehavior = false;
+			listViewPasswords.View = System.Windows.Forms.View.Details;
+			listViewPasswords.ColumnWidthChanging += listViewPasswords_ColumnWidthChanging;
+			listViewPasswords.ItemActivate += ListViewEntries_ItemActivate;
 			// 
 			// columnHeaderService
 			// 
@@ -184,7 +188,7 @@ namespace Manager
 			// columnHeaderName
 			// 
 			columnHeaderName.Text = "Account Name";
-			columnHeaderName.Width = 300;
+			columnHeaderName.Width = 292;
 			// 
 			// buttonAdd
 			// 
@@ -319,7 +323,8 @@ namespace Manager
 			// 
 			// tabPagePasswords
 			// 
-			tabPagePasswords.Controls.Add(listViewEntries);
+			tabPagePasswords.BackColor = System.Drawing.SystemColors.Control;
+			tabPagePasswords.Controls.Add(listViewPasswords);
 			tabPagePasswords.Controls.Add(infoPanel);
 			tabPagePasswords.Controls.Add(buttonWebsite);
 			tabPagePasswords.Controls.Add(checkBoxVisible);
@@ -333,17 +338,16 @@ namespace Manager
 			tabPagePasswords.Size = new System.Drawing.Size(687, 437);
 			tabPagePasswords.TabIndex = 0;
 			tabPagePasswords.Text = "Login Details";
-			tabPagePasswords.UseVisualStyleBackColor = true;
 			// 
 			// tabPageTextEntries
 			// 
+			tabPageTextEntries.BackColor = System.Drawing.SystemColors.Control;
 			tabPageTextEntries.Location = new System.Drawing.Point(4, 29);
 			tabPageTextEntries.Name = "tabPageTextEntries";
 			tabPageTextEntries.Padding = new System.Windows.Forms.Padding(3);
 			tabPageTextEntries.Size = new System.Drawing.Size(687, 437);
 			tabPageTextEntries.TabIndex = 1;
 			tabPageTextEntries.Text = "Text Entries";
-			tabPageTextEntries.UseVisualStyleBackColor = true;
 			// 
 			// tabPageFiles
 			// 
@@ -400,7 +404,7 @@ namespace Manager
         private System.Windows.Forms.Label infoAccountLabel;
         private System.Windows.Forms.Label infoServiceLabel;
         private System.Windows.Forms.TextBox textBoxInfoService;
-        private System.Windows.Forms.ListView listViewEntries;
+        private System.Windows.Forms.ListView listViewPasswords;
         private System.Windows.Forms.Button buttonAdd;
         private System.Windows.Forms.Button buttonEdit;
         private System.Windows.Forms.Button buttonDelete;
