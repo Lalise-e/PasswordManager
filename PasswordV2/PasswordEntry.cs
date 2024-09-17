@@ -6,12 +6,12 @@ using System.IO;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace Password
+namespace PasswordV2
 {
-    public class PasswordEntry
+    public class PasswordV2
     {
         /// <summary>
-        /// The directory where a <see cref="PasswordEntry"/> will be saved when using the <see cref="Save()"/> method.
+        /// The directory where a <see cref="PasswordV2"/> will be saved when using the <see cref="Save()"/> method.
         /// </summary>
         public static string EntryDirectory { get; set; }
         /// <summary>
@@ -23,7 +23,7 @@ namespace Password
             set { accountName = value; }
         }
         /// <summary>
-        /// Path of the file containing the encrypted <see cref="PasswordEntry"/>.
+        /// Path of the file containing the encrypted <see cref="PasswordV2"/>.
         /// </summary>
         public string Filename
         {
@@ -77,10 +77,10 @@ namespace Password
         private string password { get; set; }
         private Aes myAes { get; set; }
         /// <summary>
-        /// Initializes a new instance of the <see cref="PasswordEntry"/> class.
+        /// Initializes a new instance of the <see cref="PasswordV2"/> class.
         /// </summary>
         /// <param name="key">Key used for encryption and decryption. Needs to be 32 bytes long.</param>
-        public PasswordEntry(byte[] key)
+        public PasswordV2(byte[] key)
         {
             if (key.Length != 32)
                 throw new ArgumentException("The key needs to be 32 bytes long");
@@ -92,11 +92,11 @@ namespace Password
             myAes.GenerateIV();
         }
         /// <summary>
-        /// Initializes a new instance of the <see cref="PasswordEntry"/> class.
+        /// Initializes a new instance of the <see cref="PasswordV2"/> class.
         /// </summary>
         /// <param name="key">Key used for encryption and decryption. Needs to be 32 bytes long.</param>
         /// <param name="path">Directory where the files containing the enrypted data are located.</param>
-        public PasswordEntry(byte[] key, string path) : this(key)
+        public PasswordV2(byte[] key, string path) : this(key)
         {
             byte[] rawData = File.ReadAllBytes(path);
             myAes.IV = rawData[0..16];
