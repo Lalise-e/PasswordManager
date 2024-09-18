@@ -58,7 +58,13 @@ namespace Manager
 			tabPagePasswords = new System.Windows.Forms.TabPage();
 			tabPageTextEntries = new System.Windows.Forms.TabPage();
 			tabPageFiles = new System.Windows.Forms.TabPage();
+			textBoxFileSize = new System.Windows.Forms.TextBox();
+			buttonDeleteFile = new System.Windows.Forms.Button();
+			buttonExportFile = new System.Windows.Forms.Button();
+			buttonImportFile = new System.Windows.Forms.Button();
 			listViewFiles = new System.Windows.Forms.ListView();
+			dialogImport = new System.Windows.Forms.OpenFileDialog();
+			dialogExport = new System.Windows.Forms.SaveFileDialog();
 			infoPanel.SuspendLayout();
 			menuStrip1.SuspendLayout();
 			tabControl.SuspendLayout();
@@ -351,6 +357,11 @@ namespace Manager
 			// 
 			// tabPageFiles
 			// 
+			tabPageFiles.BackColor = System.Drawing.SystemColors.Control;
+			tabPageFiles.Controls.Add(textBoxFileSize);
+			tabPageFiles.Controls.Add(buttonDeleteFile);
+			tabPageFiles.Controls.Add(buttonExportFile);
+			tabPageFiles.Controls.Add(buttonImportFile);
 			tabPageFiles.Controls.Add(listViewFiles);
 			tabPageFiles.Location = new System.Drawing.Point(4, 29);
 			tabPageFiles.Name = "tabPageFiles";
@@ -358,16 +369,54 @@ namespace Manager
 			tabPageFiles.Size = new System.Drawing.Size(687, 437);
 			tabPageFiles.TabIndex = 2;
 			tabPageFiles.Text = "Files";
-			tabPageFiles.UseVisualStyleBackColor = true;
+			// 
+			// textBoxFileSize
+			// 
+			textBoxFileSize.Location = new System.Drawing.Point(176, 8);
+			textBoxFileSize.Name = "textBoxFileSize";
+			textBoxFileSize.ReadOnly = true;
+			textBoxFileSize.Size = new System.Drawing.Size(164, 27);
+			textBoxFileSize.TabIndex = 4;
+			// 
+			// buttonDeleteFile
+			// 
+			buttonDeleteFile.Location = new System.Drawing.Point(176, 41);
+			buttonDeleteFile.Name = "buttonDeleteFile";
+			buttonDeleteFile.Size = new System.Drawing.Size(164, 29);
+			buttonDeleteFile.TabIndex = 3;
+			buttonDeleteFile.Text = "Delete";
+			buttonDeleteFile.UseVisualStyleBackColor = true;
+			buttonDeleteFile.Click += buttonDeleteFile_Click;
+			// 
+			// buttonExportFile
+			// 
+			buttonExportFile.Location = new System.Drawing.Point(6, 41);
+			buttonExportFile.Name = "buttonExportFile";
+			buttonExportFile.Size = new System.Drawing.Size(164, 29);
+			buttonExportFile.TabIndex = 2;
+			buttonExportFile.Text = "Export File";
+			buttonExportFile.UseVisualStyleBackColor = true;
+			buttonExportFile.Click += buttonExportFile_Click;
+			// 
+			// buttonImportFile
+			// 
+			buttonImportFile.Location = new System.Drawing.Point(6, 6);
+			buttonImportFile.Name = "buttonImportFile";
+			buttonImportFile.Size = new System.Drawing.Size(164, 29);
+			buttonImportFile.TabIndex = 1;
+			buttonImportFile.Text = "Import File";
+			buttonImportFile.UseVisualStyleBackColor = true;
+			buttonImportFile.Click += buttonImportFile_Click;
 			// 
 			// listViewFiles
 			// 
-			listViewFiles.Location = new System.Drawing.Point(6, 6);
+			listViewFiles.Location = new System.Drawing.Point(3, 76);
 			listViewFiles.Name = "listViewFiles";
-			listViewFiles.Size = new System.Drawing.Size(675, 359);
+			listViewFiles.Size = new System.Drawing.Size(678, 355);
 			listViewFiles.TabIndex = 0;
 			listViewFiles.UseCompatibleStateImageBehavior = false;
-			listViewFiles.View = System.Windows.Forms.View.SmallIcon;
+			listViewFiles.View = System.Windows.Forms.View.Tile;
+			listViewFiles.ItemActivate += listViewFiles_ItemActivate;
 			// 
 			// Form1
 			// 
@@ -389,6 +438,7 @@ namespace Manager
 			tabPagePasswords.ResumeLayout(false);
 			tabPagePasswords.PerformLayout();
 			tabPageFiles.ResumeLayout(false);
+			tabPageFiles.PerformLayout();
 			ResumeLayout(false);
 			PerformLayout();
 		}
@@ -425,6 +475,12 @@ namespace Manager
 		private System.Windows.Forms.ColumnHeader columnHeaderService;
 		private System.Windows.Forms.ColumnHeader columnHeaderName;
 		private System.Windows.Forms.ListView listViewFiles;
+		private System.Windows.Forms.Button buttonDeleteFile;
+		private System.Windows.Forms.Button buttonExportFile;
+		private System.Windows.Forms.Button buttonImportFile;
+		private System.Windows.Forms.OpenFileDialog dialogImport;
+		private System.Windows.Forms.SaveFileDialog dialogExport;
+		private System.Windows.Forms.TextBox textBoxFileSize;
 	}
 }
 

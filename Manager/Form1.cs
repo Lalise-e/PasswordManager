@@ -69,6 +69,11 @@ namespace Manager
 					AddPasswordEntry(file as PasswordEntry);
 					continue;
 				}
+				if (file.GetType() == typeof(FileEntry))
+				{
+					AddFileEntry(file as FileEntry);
+					continue;
+				}
 				throw new UnhandledTypeException("File type is not handled", file.GetType());
 			}
 		}
@@ -154,7 +159,6 @@ namespace Manager
 			PasswordEntries.Add(entry);
 			ListViewItem item = MakePasswordListItem(entry);
 			listViewPasswords.Items.Add(item);
-			listViewPasswords.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
 		}
 		private static ListViewItem MakePasswordListItem(PasswordEntry entry)
 		{
@@ -162,7 +166,7 @@ namespace Manager
 			{
 				Text = entry.Service,
 				Tag = entry,
-				Name = entry.ID.ToString()	
+				Name = entry.ID.ToString()
 			};
 			item.SubItems.Add(entry.AccountName);
 			return item;
@@ -170,7 +174,7 @@ namespace Manager
 		private void ListViewEntries_ItemActivate(object sender, EventArgs e)
 		{
 			PasswordEntry entry;
-			try { entry = GetActiveEntry(); }
+			try { entry = GetActivePasswordEntry(); }
 			catch { return; }
 			LoadPasswordEntry(entry);
 		}
@@ -202,7 +206,7 @@ namespace Manager
 		private void ButtonEdit_Click(object sender, EventArgs e)
 		{
 			PasswordEntry entry;
-			try { entry = GetActiveEntry(); }
+			try { entry = GetActivePasswordEntry(); }
 			catch { return; }
 			using (PasswordEntryMaker maker = new(GetHash(MasterPassword), entry))
 			{
@@ -216,7 +220,7 @@ namespace Manager
 		private void ButtonDelete_Click(object sender, EventArgs e)
 		{
 			PasswordEntry entry;
-			try { entry = GetActiveEntry(); }
+			try { entry = GetActivePasswordEntry(); }
 			catch { return; }
 			entry.Delete();
 			ClearInfo();
@@ -277,7 +281,7 @@ namespace Manager
 				if (e.GetType() == typeof(TextBox))
 					(e as TextBox).Text = "";
 		}
-		private PasswordEntry GetActiveEntry()
+		private PasswordEntry GetActivePasswordEntry()
 		{
 			PasswordEntry entry;
 			try { entry = listViewPasswords.SelectedItems[0].Tag as PasswordEntry; }
@@ -301,7 +305,67 @@ namespace Manager
 		#region TextStuff
 		#endregion
 		#region FileStuff
-
+		private FileEntry GetActiveFileEntry()
+		{
+			FileEntry entry;
+			try { entry = listViewFiles.SelectedItems[0].Tag as FileEntry; }
+			catch (ArgumentOutOfRangeException) { DisplayError("Nothing is selected."); throw new Exception(); }
+			catch (Exception) { DisplayError("Something went wrong."); throw; }
+			return entry;
+		}
+		private void AddFileEntry(FileEntry entry)
+		{
+			FileEntries.Add(entry);
+			listViewFiles.Items.Add(MakeFileListItem(entry));
+		}
+		private ListViewItem MakeFileListItem(FileEntry entry)
+		{
+			ListViewItem item = new ListViewItem()
+			{
+				Name = entry.ID.ToString(),
+				Tag = entry,
+				Text = entry.OriginalFileName
+			};
+			return item;
+		}
+		private void buttonImportFile_Click(object sender, EventArgs e)
+		{
+			DialogResult r = dialogImport.ShowDialog();
+			if (r != DialogResult.OK)
+				return;
+			FileEntry entry = new(GetHash(MasterPassword));
+			entry.Import(dialogImport.FileName);
+			entry.Save();
+			AddFileEntry(entry);
+		}
+		private void buttonExportFile_Click(object sender, EventArgs e)
+		{
+			FileEntry entry;
+			try { entry = GetActiveFileEntry(); }
+			catch { return; }
+			dialogExport.FileName = entry.OriginalFileName;
+			DialogResult r = dialogExport.ShowDialog();
+			if (r != DialogResult.OK)
+				return;
+			entry.Export(dialogExport.FileName);
+		}
+		private void buttonDeleteFile_Click(object sender, EventArgs e)
+		{
+			FileEntry entry;
+			try { entry = GetActiveFileEntry(); }
+			catch { return; }
+			listViewFiles.Items.RemoveByKey(entry.ID.ToString());
+			entry.Delete();
+			entry.ReleaseID();
+			textBoxFileSize.Text = "";
+		}
+		private void listViewFiles_ItemActivate(object sender, EventArgs e)
+		{
+			FileEntry entry;
+			try { entry = GetActiveFileEntry(); }
+			catch { return; }
+			textBoxFileSize.Text = entry.OriginalSize.ToString();
+		}
 		#endregion
 		internal static void DisplayError(Exception e) => DisplayError(e.Message);
 		internal static void DisplayError(string message) => MessageBox.Show(message, "Error", MessageBoxButtons.OKCancel, MessageBoxIcon.Error);
