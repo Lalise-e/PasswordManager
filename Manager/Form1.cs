@@ -225,8 +225,11 @@ namespace Manager
 		}
 		private void buttonCopy_Click(object sender, EventArgs e)
 		{
-			if (textBoxInfoPassword.Text == null)
+			if (string.IsNullOrEmpty(textBoxInfoPassword.Text))
+			{
+				DisplayError("Nothing to copy");
 				return;
+			}
 			Clipboard.SetText(textBoxInfoPassword.Text);
 		}
 		private void buttonWebsite_Click(object sender, EventArgs e)
