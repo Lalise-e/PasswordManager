@@ -1,7 +1,7 @@
 ﻿
 namespace Manager
 {
-    partial class EntryMaker
+    partial class PasswordEntryMaker
     {
         /// <summary>
         /// Required designer variable.

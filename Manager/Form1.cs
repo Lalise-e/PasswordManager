@@ -152,21 +152,27 @@ namespace Manager
 		private void AddPasswordEntry(PasswordEntry entry)
 		{
 			PasswordEntries.Add(entry);
+			ListViewItem item = MakePasswordListItem(entry);
+			listViewPasswords.Items.Add(item);
+			listViewPasswords.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
+		}
+		private static ListViewItem MakePasswordListItem(PasswordEntry entry)
+		{
 			ListViewItem item = new ListViewItem()
 			{
 				Text = entry.Service,
 				Tag = entry,
+				Name = entry.ID.ToString()	
 			};
 			item.SubItems.Add(entry.AccountName);
-			listViewPasswords.Items.Add(item);
-			listViewPasswords.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
+			return item;
 		}
 		private void ListViewEntries_ItemActivate(object sender, EventArgs e)
 		{
 			PasswordEntry entry;
 			try { entry = GetActiveEntry(); }
 			catch { return; }
-			LoadEntry(entry);
+			LoadPasswordEntry(entry);
 		}
 		/// <summary>
 		/// This is needed so the stack won't overflow when resizing the columns, just ignore it.
@@ -188,39 +194,34 @@ namespace Manager
 		}
 		private void ButtonAdd_Click(object sender, EventArgs e)
 		{
-			using (EntryMaker maker = new(GetHash(MasterPassword)))
+			using (PasswordEntryMaker maker = new(GetHash(MasterPassword)))
 			{
-				handleMaker(maker);
+				handlePasswordMaker(maker);
 			}
 		}
 		private void ButtonEdit_Click(object sender, EventArgs e)
 		{
-			//LoadListItem should not be used here
-			throw new NotImplementedException();
 			PasswordEntry entry;
 			try { entry = GetActiveEntry(); }
 			catch { return; }
-			using (EntryMaker maker = new(GetHash(MasterPassword), entry))
+			using (PasswordEntryMaker maker = new(GetHash(MasterPassword), entry))
 			{
-				DialogResult result = handleMaker(maker);
+				DialogResult result = handlePasswordMaker(maker);
 				if (result == DialogResult.OK)
 				{
-					if (maker.Entry.Filename != entry.Filename)
-						entry.Delete();
-					LoadListItems();
+
 				}
 			}
 		}
 		private void ButtonDelete_Click(object sender, EventArgs e)
 		{
-			//This is old and needs to be updated to not be shit
-			throw new NotImplementedException();
 			PasswordEntry entry;
 			try { entry = GetActiveEntry(); }
 			catch { return; }
 			entry.Delete();
 			ClearInfo();
-			LoadListItems();
+			listViewPasswords.Items.RemoveByKey(entry.ID.ToString());
+			entry.ReleaseID();
 		}
 		private void buttonCopy_Click(object sender, EventArgs e)
 		{
@@ -242,12 +243,9 @@ namespace Manager
 			};
 			if (settings.Incognito)
 			{
-				info.Arguments += $"-private-window {textBoxInfoDomain.Text}";
+				info.Arguments += "-private-window";
 			}
-			else
-			{
-				info.Arguments += $"{textBoxInfoDomain.Text}";
-			}
+			info.Arguments += $" {textBoxInfoDomain.Text}";
 			try { Process.Start(info); }
 			catch (Exception ex) { DisplayError(ex); }
 		}
@@ -260,7 +258,7 @@ namespace Manager
 			}
 			textBoxInfoPassword.PasswordChar = '*';
 		}
-		private void LoadEntry(PasswordEntry entry)
+		private void LoadPasswordEntry(PasswordEntry entry)
 		{
 			textBoxInfoAccount.Text = entry.AccountName;
 			if (entry.Domain != null)
@@ -284,20 +282,15 @@ namespace Manager
 			catch (Exception) { DisplayError("Something went wrong."); throw; }
 			return entry;
 		}
-		private DialogResult handleMaker(EntryMaker maker)
+		private DialogResult handlePasswordMaker(PasswordEntryMaker maker)
 		{
 			DialogResult result = maker.ShowDialog();
 			if (result == DialogResult.OK)
 			{
-				maker.Entry.Delete();
 				maker.Entry.Save();
-				LoadEntry(maker.Entry);
-				ListViewItem item = new()
-				{
-					Text = $"{maker.Entry.Service} - {maker.Entry.AccountName}",
-					Tag = maker.Entry
-				};
-				listViewPasswords.Items.Add(item);
+				LoadPasswordEntry(maker.Entry);
+				listViewPasswords.Items.RemoveByKey(maker.Entry.ID.ToString());
+				listViewPasswords.Items.Add(MakePasswordListItem(maker.Entry));
 			}
 			return result;
 		}
