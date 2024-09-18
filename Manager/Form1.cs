@@ -55,7 +55,6 @@ namespace Manager
 		}
 		private void LoadListItems()
 		{
-			//This needs a rewrite, loading all the encrypted files from storage will cause issues with IDs
 			string[] paths = Directory.GetFiles(EntryDirectory);
 			for (int i = 0; i < paths.Length; i++)
 			{
@@ -70,6 +69,7 @@ namespace Manager
 					AddPasswordEntry(file as PasswordEntry);
 					continue;
 				}
+				throw new UnhandledTypeException("File type is not handled", file.GetType());
 			}
 		}
 		private void ToolStripMenuItemIncognito_Click(object sender, EventArgs e)
