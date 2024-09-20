@@ -12,10 +12,10 @@ namespace Password
 	}
 	internal class PropertyIDAttribute : Attribute
 	{
-		internal int ID { get; set; }
-		internal PropertyIDAttribute(int iD)
+		internal short ID { get; set; }
+		internal PropertyIDAttribute(short id)
 		{
-			ID = iD;
+			ID = id;
 		}
 	}
 }

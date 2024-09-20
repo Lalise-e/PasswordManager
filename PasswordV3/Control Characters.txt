@@ -1,0 +1,5 @@
+﻿Integer				Use
+0x00				The main seperator between properties in an encrypted file
+0x01				Primary Seperator within properties, so far only used to seperate the key
+					from the IV in Aes
+0x02				Seperates the property from the property ID, not implemented yet.

@@ -15,6 +15,13 @@ namespace Password
 	/// </summary>
 	public abstract class EncryptedFile
 	{
+		[PropertyID(short.MinValue)]
+		public string Version
+		{
+			get { return _version; }
+			set { return; }
+		}
+		private const string _version = "3.0";
 		/// <summary>
 		/// The directory where an <see cref="EncryptedFile"/> and its derived classes will be saved when using the <see cref="Save()"/> method.
 		/// </summary>
@@ -55,24 +62,31 @@ namespace Password
 			myAes = aes;
 			Type localType = GetType();
 			PropertyInfo[] Infos = propertiesToSave[localType];
-			string[] encodedProperties = content.Split('\0');
+			Dictionary<short, PropertyInfo> shortKey = new Dictionary<short, PropertyInfo>(Infos.Length);
 			for (int i = 0; i < Infos.Length; i++)
 			{
-				PropertyInfo info = Infos[i];
+				shortKey.Add(Infos[i].GetCustomAttribute<PropertyIDAttribute>().ID, Infos[i]);
+			}
+			string[] encodedProperties = content.Split('\0');
+			string[] idAndProp;
+			for (int i = 0; i < encodedProperties.Length; i++)
+			{
+				idAndProp = encodedProperties[i].Split((char)0x02);
+				PropertyInfo info = shortKey[Base64ToShort(idAndProp[0])];
 				Type pType = info.PropertyType;
 				if(pType == typeof(string))
 				{
-					info.SetValue(this, Base64ToText(encodedProperties[i]));
+					info.SetValue(this, Base64ToText(idAndProp[1]));
 					continue;
 				}
 				if(pType == typeof(Aes))
 				{
-					info.SetValue(this, Base64ToAes(encodedProperties[i]));
+					info.SetValue(this, Base64ToAes(idAndProp[1]));
 					continue;
 				}
 				if(pType == typeof(Uri))
 				{
-					info.SetValue(this, Base64ToUri(encodedProperties[i]));
+					info.SetValue(this, Base64ToUri(idAndProp[1]));
 					continue;
 				}
 				throw new UnhandledTypeException("Decoding for type is not handled.", pType);
@@ -170,6 +184,7 @@ namespace Password
 				object ob = info.GetValue(this, null);
 				if (ob == null)
 					continue;
+				result += ShortToBase64(info.GetCustomAttribute<PropertyIDAttribute>().ID) + (char)0x02;
 				Type objectType = ob.GetType();
 				if (objectType == typeof(string))
 				{
@@ -203,6 +218,14 @@ namespace Password
 				return "";
 			byte[] bytes = Convert.FromBase64String(encodedString);
 			return Encoding.UTF8.GetString(bytes);
+		}
+		protected string ShortToBase64(short value)
+		{
+			return ByteArrayToBase64(BitConverter.GetBytes(value));
+		}
+		protected short Base64ToShort(string encodedString)
+		{
+			return BitConverter.ToInt16(Base64ToByteArray(encodedString));
 		}
 		protected string ByteArrayToBase64(byte[] bytes)
 		{
