@@ -666,44 +666,15 @@ namespace Password
 		}
 		public static string GetFileSize(string file)
 		{
-			string result = "";
 			string prefix = "B";
+			char[] prefixes = new char[] { 'k', 'M', 'G', 'T', 'P', 'E' };
 			double divisor = 1;
 			long length = new FileInfo(file).Length;
 			double exponent = Math.Log2(length);
-			if (exponent < 10) ;
-			else if (exponent < 20)
-			{
-				divisor = Math.Pow(2, 10);
-				prefix = "k" + prefix;
-			}
-			else if (exponent < 30)
-			{
-				divisor = Math.Pow(2, 20);
-				prefix = "M" + prefix;
-			}
-			else if (exponent < 40)
-			{
-				divisor = Math.Pow(2, 30);
-				prefix = "G" + prefix;
-			}
-			else if (exponent < 50)
-			{
-				divisor = Math.Pow(2, 40);
-				prefix = "T" + prefix;
-			}
-			else if (exponent < 60)
-			{
-				divisor = Math.Pow(2, 50);
-				prefix = "P" + prefix;
-			}
-			else if (exponent < 70)
-			{
-				divisor = Math.Pow(2, 60);
-				prefix = "E" + prefix;
-			}
-			result = string.Format("{1} {0:00}", prefix, Math.Round(length / divisor, 2));
-			return result;
+			divisor = Math.Pow(2, ((int)exponent / 10) * 10);
+			if (exponent >= 10)
+				prefix = prefixes[((int)exponent / 10) - 1] + prefix;
+			return string.Format("{1} {0:00}", prefix, Math.Round(length / divisor, 2));
 		}
 		/// <summary>
 		/// Encrypts <see cref="FileSource"/> and then executes <see cref="EncryptedFile.Save"/>
