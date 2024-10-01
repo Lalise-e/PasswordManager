@@ -57,18 +57,28 @@ namespace Manager
 			tabControl = new System.Windows.Forms.TabControl();
 			tabPagePasswords = new System.Windows.Forms.TabPage();
 			tabPageTextEntries = new System.Windows.Forms.TabPage();
+			buttonSaveText = new System.Windows.Forms.Button();
+			textBoxBody = new System.Windows.Forms.TextBox();
+			textBoxTitle = new System.Windows.Forms.TextBox();
+			buttonDeleteText = new System.Windows.Forms.Button();
+			buttonNewText = new System.Windows.Forms.Button();
+			listViewText = new System.Windows.Forms.ListView();
+			columnHeaderTextTitle = new System.Windows.Forms.ColumnHeader();
 			tabPageFiles = new System.Windows.Forms.TabPage();
 			textBoxFileSize = new System.Windows.Forms.TextBox();
 			buttonDeleteFile = new System.Windows.Forms.Button();
 			buttonExportFile = new System.Windows.Forms.Button();
 			buttonImportFile = new System.Windows.Forms.Button();
 			listViewFiles = new System.Windows.Forms.ListView();
+			columnHeaderFileName = new System.Windows.Forms.ColumnHeader();
+			columnHeaderSize = new System.Windows.Forms.ColumnHeader();
 			dialogImport = new System.Windows.Forms.OpenFileDialog();
 			dialogExport = new System.Windows.Forms.SaveFileDialog();
 			infoPanel.SuspendLayout();
 			menuStrip1.SuspendLayout();
 			tabControl.SuspendLayout();
 			tabPagePasswords.SuspendLayout();
+			tabPageTextEntries.SuspendLayout();
 			tabPageFiles.SuspendLayout();
 			SuspendLayout();
 			// 
@@ -183,7 +193,7 @@ namespace Manager
 			listViewPasswords.TabIndex = 1;
 			listViewPasswords.UseCompatibleStateImageBehavior = false;
 			listViewPasswords.View = System.Windows.Forms.View.Details;
-			listViewPasswords.ColumnWidthChanging += listViewPasswords_ColumnWidthChanging;
+			listViewPasswords.ColumnWidthChanging += listViewDetails_ColumnWidthChanging;
 			listViewPasswords.ItemActivate += ListViewEntries_ItemActivate;
 			// 
 			// columnHeaderService
@@ -348,6 +358,12 @@ namespace Manager
 			// tabPageTextEntries
 			// 
 			tabPageTextEntries.BackColor = System.Drawing.SystemColors.Control;
+			tabPageTextEntries.Controls.Add(buttonSaveText);
+			tabPageTextEntries.Controls.Add(textBoxBody);
+			tabPageTextEntries.Controls.Add(textBoxTitle);
+			tabPageTextEntries.Controls.Add(buttonDeleteText);
+			tabPageTextEntries.Controls.Add(buttonNewText);
+			tabPageTextEntries.Controls.Add(listViewText);
 			tabPageTextEntries.Location = new System.Drawing.Point(4, 29);
 			tabPageTextEntries.Name = "tabPageTextEntries";
 			tabPageTextEntries.Padding = new System.Windows.Forms.Padding(3);
@@ -355,8 +371,71 @@ namespace Manager
 			tabPageTextEntries.TabIndex = 1;
 			tabPageTextEntries.Text = "Text Entries";
 			// 
+			// buttonSaveText
+			// 
+			buttonSaveText.Location = new System.Drawing.Point(587, 8);
+			buttonSaveText.Name = "buttonSaveText";
+			buttonSaveText.Size = new System.Drawing.Size(94, 27);
+			buttonSaveText.TabIndex = 5;
+			buttonSaveText.Text = "Save";
+			buttonSaveText.UseVisualStyleBackColor = true;
+			// 
+			// textBoxBody
+			// 
+			textBoxBody.Location = new System.Drawing.Point(204, 41);
+			textBoxBody.Multiline = true;
+			textBoxBody.Name = "textBoxBody";
+			textBoxBody.PlaceholderText = "Body";
+			textBoxBody.ReadOnly = true;
+			textBoxBody.Size = new System.Drawing.Size(477, 390);
+			textBoxBody.TabIndex = 4;
+			// 
+			// textBoxTitle
+			// 
+			textBoxTitle.Location = new System.Drawing.Point(204, 8);
+			textBoxTitle.Name = "textBoxTitle";
+			textBoxTitle.PlaceholderText = "Title";
+			textBoxTitle.ReadOnly = true;
+			textBoxTitle.Size = new System.Drawing.Size(377, 27);
+			textBoxTitle.TabIndex = 3;
+			// 
+			// buttonDeleteText
+			// 
+			buttonDeleteText.Location = new System.Drawing.Point(6, 41);
+			buttonDeleteText.Name = "buttonDeleteText";
+			buttonDeleteText.Size = new System.Drawing.Size(192, 29);
+			buttonDeleteText.TabIndex = 2;
+			buttonDeleteText.Text = "Delete";
+			buttonDeleteText.UseVisualStyleBackColor = true;
+			// 
+			// buttonNewText
+			// 
+			buttonNewText.Location = new System.Drawing.Point(6, 6);
+			buttonNewText.Name = "buttonNewText";
+			buttonNewText.Size = new System.Drawing.Size(192, 29);
+			buttonNewText.TabIndex = 1;
+			buttonNewText.Text = "New";
+			buttonNewText.UseVisualStyleBackColor = true;
+			buttonNewText.Click += buttonNewText_Click;
+			// 
+			// listViewText
+			// 
+			listViewText.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] { columnHeaderTextTitle });
+			listViewText.Location = new System.Drawing.Point(6, 76);
+			listViewText.Name = "listViewText";
+			listViewText.Size = new System.Drawing.Size(192, 355);
+			listViewText.TabIndex = 0;
+			listViewText.UseCompatibleStateImageBehavior = false;
+			listViewText.View = System.Windows.Forms.View.Details;
+			// 
+			// columnHeaderTextTitle
+			// 
+			columnHeaderTextTitle.Text = "Title";
+			columnHeaderTextTitle.Width = 188;
+			// 
 			// tabPageFiles
 			// 
+			tabPageFiles.AllowDrop = true;
 			tabPageFiles.BackColor = System.Drawing.SystemColors.Control;
 			tabPageFiles.Controls.Add(textBoxFileSize);
 			tabPageFiles.Controls.Add(buttonDeleteFile);
@@ -410,16 +489,33 @@ namespace Manager
 			// 
 			// listViewFiles
 			// 
+			listViewFiles.AllowDrop = true;
+			listViewFiles.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] { columnHeaderFileName, columnHeaderSize });
+			listViewFiles.FullRowSelect = true;
 			listViewFiles.Location = new System.Drawing.Point(3, 76);
 			listViewFiles.Name = "listViewFiles";
 			listViewFiles.Size = new System.Drawing.Size(678, 355);
 			listViewFiles.TabIndex = 0;
 			listViewFiles.UseCompatibleStateImageBehavior = false;
-			listViewFiles.View = System.Windows.Forms.View.Tile;
+			listViewFiles.View = System.Windows.Forms.View.Details;
+			listViewFiles.ColumnWidthChanging += listViewDetails_ColumnWidthChanging;
 			listViewFiles.ItemActivate += listViewFiles_ItemActivate;
+			listViewFiles.DragDrop += listViewFiles_DragDrop;
+			listViewFiles.DragEnter += listViewFiles_DragEnter;
+			// 
+			// columnHeaderFileName
+			// 
+			columnHeaderFileName.Text = "File Name";
+			columnHeaderFileName.Width = 79;
+			// 
+			// columnHeaderSize
+			// 
+			columnHeaderSize.Text = "Encrypted Size";
+			columnHeaderSize.Width = 595;
 			// 
 			// Form1
 			// 
+			AllowDrop = true;
 			AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
 			AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			ClientSize = new System.Drawing.Size(719, 513);
@@ -437,6 +533,8 @@ namespace Manager
 			tabControl.ResumeLayout(false);
 			tabPagePasswords.ResumeLayout(false);
 			tabPagePasswords.PerformLayout();
+			tabPageTextEntries.ResumeLayout(false);
+			tabPageTextEntries.PerformLayout();
 			tabPageFiles.ResumeLayout(false);
 			tabPageFiles.PerformLayout();
 			ResumeLayout(false);
@@ -481,6 +579,16 @@ namespace Manager
 		private System.Windows.Forms.OpenFileDialog dialogImport;
 		private System.Windows.Forms.SaveFileDialog dialogExport;
 		private System.Windows.Forms.TextBox textBoxFileSize;
+		private System.Windows.Forms.ListView listViewText;
+		private System.Windows.Forms.Label label2;
+		private System.Windows.Forms.Button buttonSaveText;
+		private System.Windows.Forms.TextBox textBoxBody;
+		private System.Windows.Forms.TextBox textBoxTitle;
+		private System.Windows.Forms.Button buttonDeleteText;
+		private System.Windows.Forms.Button buttonNewText;
+		private System.Windows.Forms.ColumnHeader columnHeaderFileName;
+		private System.Windows.Forms.ColumnHeader columnHeaderSize;
+		private System.Windows.Forms.ColumnHeader columnHeaderTextTitle;
 	}
 }
 

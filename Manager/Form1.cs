@@ -74,6 +74,11 @@ namespace Manager
 					AddFileEntry(file as FileEntry);
 					continue;
 				}
+				if(file.GetType() == typeof(TextEntry))
+				{
+					AddTextEntry(file as TextEntry);
+					continue;
+				}
 				throw new UnhandledTypeException("File type is not handled", file.GetType());
 			}
 		}
@@ -303,6 +308,60 @@ namespace Manager
 		}
 		#endregion
 		#region TextStuff
+		private TextEntry currentlyLoadedTextEntry;
+		private void PromptSave()
+		{
+			DialogResult r = MessageBox.Show($"You have unsaved changes.{Environment.NewLine}Do you want to save?",
+				"Warning!", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+			if (r == DialogResult.No)
+				return;
+			currentlyLoadedTextEntry.Text = textBoxBody.Text;
+			currentlyLoadedTextEntry.Title = textBoxTitle.Text;
+			currentlyLoadedTextEntry.Save();
+			listViewText.Items.RemoveByKey(currentlyLoadedTextEntry.ID.ToString());
+			listViewText.Items.Add(MakeTextListItem(currentlyLoadedTextEntry));
+		}
+		private bool NeedSavePrompt()
+		{
+			if (currentlyLoadedTextEntry == null)
+				return false;
+			if (currentlyLoadedTextEntry.Text != textBoxBody.Text)
+				return true;
+			if(currentlyLoadedTextEntry.Title != textBoxTitle.Text)
+				return true;
+			return false;
+		}
+		private void AddTextEntry(TextEntry entry)
+		{
+			TextEntries.Add(entry);
+			listViewText.Items.Add(MakeTextListItem(entry));
+		}
+		private ListViewItem MakeTextListItem(TextEntry entry)
+		{
+			ListViewItem item = new ListViewItem()
+			{
+				Name = entry.ID.ToString(),
+				Tag = entry,
+				Text = entry.Title
+			};
+			return item;
+		}
+		private void buttonNewText_Click(object sender, EventArgs e)
+		{
+			TextEntry entry = new(GetHash(MasterPassword))
+			{
+				Title = "Placeholder Title"
+			};
+			if (NeedSavePrompt())
+				PromptSave();
+			currentlyLoadedTextEntry = entry;
+			AddTextEntry(entry);
+			entry.Save();
+			textBoxBody.Text = "";
+			textBoxBody.ReadOnly = false;
+			textBoxTitle.Text = "Placeholder Title";
+			textBoxTitle.ReadOnly =false;
+		}
 		#endregion
 		#region FileStuff
 		private FileEntry GetActiveFileEntry()
