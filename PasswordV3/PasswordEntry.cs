@@ -22,6 +22,7 @@ namespace Password
 			set { return; }
 		}
 		private const string _version = "3.0";
+		private const string _nullchar = "\u0003";
 		/// <summary>
 		/// The directory where an <see cref="EncryptedFile"/> and its derived classes will be saved when using the <see cref="Save()"/> method.
 		/// </summary>
@@ -75,7 +76,7 @@ namespace Password
 				PropertyInfo info = shortKey[Base64ToShort(idAndProp[0])];
 				Type pType = info.PropertyType;
 				if(pType == typeof(string))
-				{
+				{ 
 					info.SetValue(this, Base64ToText(idAndProp[1]));
 					continue;
 				}
@@ -139,6 +140,11 @@ namespace Password
 				throw new Exception($"File {path} has an invalid file name, it needs to be a number between 0 and {ulong.MaxValue}");
 			return result;
 		}
+		public void ChangeKey(byte[] newKey)
+		{
+			myAes = GenerateAES(newKey);
+			Save();
+		}
 		/// <summary>
 		/// Saves the data in <see cref="FileDirectory"/>.
 		/// </summary>
@@ -168,7 +174,7 @@ namespace Password
 		/// </summary>
 		/// <exception cref="MissingAttributeException"></exception>
 		/// <exception cref="UnhandledTypeException"></exception>
-		private string GetFileContent()
+		protected virtual string GetFileContent()
 		{
 			string result = "";
 			LoadClasses();
@@ -183,7 +189,10 @@ namespace Password
 				PropertyInfo info = infos[i];
 				object ob = info.GetValue(this, null);
 				if (ob == null)
+				{
+					result += $"{ShortToBase64(info.GetCustomAttribute<PropertyIDAttribute>().ID)}{(char)0x02}{(char)0x03}";
 					continue;
+				}
 				result += ShortToBase64(info.GetCustomAttribute<PropertyIDAttribute>().ID) + (char)0x02;
 				Type objectType = ob.GetType();
 				if (objectType == typeof(string))
@@ -208,13 +217,13 @@ namespace Password
 		protected string TextToBase64(string text)
 		{
 			if (string.IsNullOrEmpty(text))
-				return "";
+				return ((char)0x03).ToString();
 			byte[] bytes = Encoding.UTF8.GetBytes(text);
 			return Convert.ToBase64String(bytes);
 		}
 		protected string Base64ToText(string encodedString)
 		{
-			if (string.IsNullOrEmpty(encodedString))
+			if (encodedString == ((char)0x03).ToString())
 				return "";
 			byte[] bytes = Convert.FromBase64String(encodedString);
 			return Encoding.UTF8.GetString(bytes);
@@ -245,6 +254,8 @@ namespace Password
 		}
 		protected string AesToBase64(Aes aes)
 		{
+			if (aes == null)
+				return _nullchar;
 			string result = "";
 			result += ByteArrayToBase64(aes.IV);
 			result += (char)0x01;
@@ -253,6 +264,8 @@ namespace Password
 		}
 		protected Aes Base64ToAes(string text)
 		{
+			if(text == _nullchar)
+				return null;
 			string[] temp = text.Split((char)0x01);
 			Aes result = GenerateAES(Base64ToByteArray(temp[1]));
 			result.IV = Base64ToByteArray(temp[0]);
@@ -260,14 +273,13 @@ namespace Password
 		}
 		protected string UriToBase64(Uri uri)
 		{
-			string result = "";
-			if(uri == null)
-				return result;
+			if (uri == null)
+				return _nullchar;
 			return TextToBase64(uri.OriginalString);
 		}
 		protected Uri Base64ToUri(string text)
 		{
-			if (string.IsNullOrEmpty(text))
+			if (text == _nullchar)
 				return null;
 			return new Uri(Base64ToText(text));
 		}
@@ -424,8 +436,8 @@ namespace Password
 		[PropertyID(3)]
 		public string Email
 		{
-			get { return email; }
-			set { email = value; }
+			get { return _email; }
+			set { _email = value; }
 		}
 		/// <summary>
 		/// The domain name for the service. Leave as <see cref="null"/> when not applicable. 
@@ -466,7 +478,7 @@ namespace Password
 			set { password = value; }
 		}
 		private string accountName { get; set; }
-		private string email { get; set; }
+		private string _email { get; set; }
 		private string domain { get; set; } = null;
 		private string service { get; set; }
 		private string password { get; set; }
@@ -589,19 +601,68 @@ namespace Password
 		}
 	}
 	/// <summary>
-	/// Not implemented yet
+	/// Handles the encryption of objects, use <see cref="MetaSerializableAttribute"/> to denote which properties in
+	/// the class will be encrypted and make sure there is a constructor that takes 0 parameters.
 	/// </summary>
 	[ClassType(FileType.MetaFile)]
 	public class MetaEntry : EncryptedFile
 	{
+		//This does not use the base decoding/encoding methods of EncryptedFile and does not need to restrict its
+		//use of control characters.
+		public object MetaContent
+		{
+			get { return MetaContent; }
+			set
+			{
+				_objectType = value.GetType();
+				MetaContent = value;
+				GeneratePropertyDictionary();
+			}
+		}
+		private object _metaContent = null;
+		private Type _objectType;
+		private Dictionary<PropertyInfo, string> _infoKey;
+		private Dictionary<string, PropertyInfo> _stringKey;
+		private PropertyInfo[] _infos;
 		public MetaEntry(byte[] key) : base(key)
 		{
 
 		}
 		internal MetaEntry(Aes aes, string content) : base(aes, content)
 		{
-
+			if (string.IsNullOrEmpty(content))
+				return;
+			string[] segments = content.Split('\0');
+			MetaContent = Type.GetType(segments[0]).GetConstructor(new Type[] { });
+			myAes = aes;
 		}
+		protected override string GetFileContent()
+		{
+			string result = "";
+			if (_metaContent == null)
+				return result;
+			result += _objectType.AssemblyQualifiedName + '\0';
+			for (int i = 0; i < _stringKey.Count; i++)
+			{
+
+			}
+			return result;
+		}
+		private void GeneratePropertyDictionary()
+		{
+			_stringKey = new();
+			_infoKey = new();
+			_infos = _objectType.GetProperties();
+			for (int i = 0; i < _infos.Length; i++)
+			{
+				MetaSerializableAttribute att = _infos[i].GetCustomAttribute<MetaSerializableAttribute>();
+				if (att == null)
+					continue;
+				_infoKey.Add(_infos[i], att.Name);
+				_stringKey.Add(att.Name, _infos[i]);
+			}
+		}
+
 	}
 	/// <summary>
 	/// Class inherited from <see cref="EncryptedFile"/> and contains methods and properties to manage an encrypted file.<br></br>
