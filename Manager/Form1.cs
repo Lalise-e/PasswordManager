@@ -415,6 +415,27 @@ namespace Manager
 			catch { return; }
 			textBoxFileSize.Text = entry.OriginalSize.ToString();
 		}
+		private void listViewFiles_DragDrop(object sender, DragEventArgs e)
+		{
+			if (!e.Data.GetDataPresent(DataFormats.FileDrop))
+				return;
+			string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+			for (int i = 0; i < files.Length; i++)
+			{
+				string file = files[i];
+				FileEntry entry = new(GetHash(MasterPassword));
+				entry.Import(file);
+				entry.Save();
+				AddFileEntry(entry);
+			}
+		}
+		private void listViewFiles_DragEnter(object sender, DragEventArgs e)
+		{
+			if (e.Data.GetDataPresent(DataFormats.FileDrop))
+				e.Effect = DragDropEffects.Copy;
+			else
+				e.Effect = DragDropEffects.None;
+		}
 		#endregion
 		internal static void DisplayError(Exception e) => DisplayError(e.Message);
 		internal static void DisplayError(string message) => MessageBox.Show(message, "Error", MessageBoxButtons.OKCancel, MessageBoxIcon.Error);
