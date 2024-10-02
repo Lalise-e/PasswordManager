@@ -368,6 +368,7 @@ namespace Manager
 				Tag = entry,
 				Text = entry.OriginalFileName
 			};
+			item.SubItems.Add(entry.EncryptedSize);
 			return item;
 		}
 		private void buttonImportFile_Click(object sender, EventArgs e)
