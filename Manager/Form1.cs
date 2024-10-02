@@ -121,8 +121,6 @@ namespace Manager
 		}
 		private void ToolStripMenuItemPassword_Click(object sender, EventArgs e)
 		{
-			//This needs to be rewritten to deal with more classes
-			throw new NotImplementedException();
 			string newPassword = null;
 			using (PasswordChanger changer = new())
 			{
@@ -132,32 +130,17 @@ namespace Manager
 					return;
 				newPassword = changer.Tag.ToString();
 			}
-			string[] files = Directory.GetFiles(EntryDirectory);
-			foreach (string file in files)
+			List<EncryptedFile> files = new(PasswordEntries);
+			files.AddRange(FileEntries);
+			files.AddRange(TextEntries);
+			//I swear to god if I have to go back at some point and make this into a for loop I will never make a
+			//foreach loop again.
+			foreach (EncryptedFile file in files)
 			{
-				if (!File.Exists(file))
-					continue;
-				PasswordEntry oldEntry = null;
-				try { oldEntry = EncryptedFile.GetFile(GetHash(MasterPassword), file) as PasswordEntry; }
-				catch
-				{
-					DisplayError($"File: {file} is corrupt.{Environment.NewLine} Either that or I suck at coding, no idea which it is.");
-					File.Delete(file);
-					continue;
+				file.ChangeKey(GetHash(newPassword));
 				}
-				PasswordEntry newEntry = new(GetHash(newPassword))
-				{
-					Password = oldEntry.Password,
-					Domain = oldEntry.Domain,
-					Service = oldEntry.Service,
-					AccountName = oldEntry.AccountName
-				};
-				oldEntry.Delete();
-				newEntry.Save();
-			}
 			MasterPassword = newPassword;
-			LoadListItems();
-		}
+			}
 		#region PasswordStuff
 		private void AddPasswordEntry(PasswordEntry entry)
 		{
