@@ -138,9 +138,9 @@ namespace Manager
 			foreach (EncryptedFile file in files)
 			{
 				file.ChangeKey(GetHash(newPassword));
-				}
-			MasterPassword = newPassword;
 			}
+			MasterPassword = newPassword;
+		}
 		#region PasswordStuff
 		private void AddPasswordEntry(PasswordEntry entry)
 		{
@@ -403,10 +403,10 @@ namespace Manager
 			for (int i = 0; i < items.Length; i++)
 			{
 				entry = items[i].Tag as FileEntry;
-			listViewFiles.Items.RemoveByKey(entry.ID.ToString());
-			entry.Delete();
-			entry.ReleaseID();
-		}
+				listViewFiles.Items.RemoveByKey(entry.ID.ToString());
+				entry.Delete();
+				entry.ReleaseID();
+			}
 		}
 		private void listViewFiles_ItemActivate(object sender, EventArgs e)
 		{
