@@ -601,68 +601,19 @@ namespace Password
 		}
 	}
 	/// <summary>
-	/// Handles the encryption of objects, use <see cref="MetaSerializableAttribute"/> to denote which properties in
-	/// the class will be encrypted and make sure there is a constructor that takes 0 parameters.
+	/// Not Implemented
 	/// </summary>
 	[ClassType(FileType.MetaFile)]
 	public class MetaEntry : EncryptedFile
 	{
-		//This does not use the base decoding/encoding methods of EncryptedFile and does not need to restrict its
-		//use of control characters.
-		public object MetaContent
-		{
-			get { return MetaContent; }
-			set
-			{
-				_objectType = value.GetType();
-				MetaContent = value;
-				GeneratePropertyDictionary();
-			}
-		}
-		private object _metaContent = null;
-		private Type _objectType;
-		private Dictionary<PropertyInfo, string> _infoKey;
-		private Dictionary<string, PropertyInfo> _stringKey;
-		private PropertyInfo[] _infos;
 		public MetaEntry(byte[] key) : base(key)
 		{
 
 		}
 		internal MetaEntry(Aes aes, string content) : base(aes, content)
 		{
-			if (string.IsNullOrEmpty(content))
-				return;
-			string[] segments = content.Split('\0');
-			MetaContent = Type.GetType(segments[0]).GetConstructor(new Type[] { });
-			myAes = aes;
-		}
-		protected override string GetFileContent()
-		{
-			string result = "";
-			if (_metaContent == null)
-				return result;
-			result += _objectType.AssemblyQualifiedName + '\0';
-			for (int i = 0; i < _stringKey.Count; i++)
-			{
 
-			}
-			return result;
 		}
-		private void GeneratePropertyDictionary()
-		{
-			_stringKey = new();
-			_infoKey = new();
-			_infos = _objectType.GetProperties();
-			for (int i = 0; i < _infos.Length; i++)
-			{
-				MetaSerializableAttribute att = _infos[i].GetCustomAttribute<MetaSerializableAttribute>();
-				if (att == null)
-					continue;
-				_infoKey.Add(_infos[i], att.Name);
-				_stringKey.Add(att.Name, _infos[i]);
-			}
-		}
-
 	}
 	/// <summary>
 	/// Class inherited from <see cref="EncryptedFile"/> and contains methods and properties to manage an encrypted file.<br></br>
