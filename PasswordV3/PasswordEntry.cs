@@ -90,6 +90,11 @@ namespace Password
 					info.SetValue(this, Base64ToUri(idAndProp[1]));
 					continue;
 				}
+				if(pType == typeof(bool))
+				{
+					info.SetValue(this, StringToBool(idAndProp[1]));
+					continue;
+				}
 				throw new UnhandledTypeException("Decoding for type is not handled.", pType);
 			}
 		}
@@ -210,6 +215,11 @@ namespace Password
 					result += UriToBase64(ob as Uri);
 					continue;
 				}
+				if(objectType == typeof(bool))
+				{
+					result += BoolToString((bool)ob);
+					continue;
+				}
 				throw new UnhandledTypeException("Encoding for type is not handled.", objectType);
 			}
 			return result;
@@ -235,6 +245,21 @@ namespace Password
 		protected short Base64ToShort(string encodedString)
 		{
 			return BitConverter.ToInt16(Base64ToByteArray(encodedString));
+		}
+		protected string BoolToString(bool value)
+		{
+			//I am god and you cannot tell me what to do, z is now true and w is now false.
+			if (value)
+				return "z";
+			return "w";
+		}
+		protected bool StringToBool(string encodedBool)
+		{
+			if(encodedBool == "z")
+				return true;
+			if (encodedBool == "w")
+				return false;
+			throw new ArgumentException("Argument needs to be z or w", nameof(encodedBool));
 		}
 		protected string ByteArrayToBase64(byte[] bytes)
 		{
