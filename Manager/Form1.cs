@@ -393,13 +393,19 @@ namespace Manager
 		}
 		private void buttonDeleteFile_Click(object sender, EventArgs e)
 		{
+			ListViewItem[] items = new ListViewItem[listViewFiles.SelectedItems.Count];
+			for (int i = 0; i < items.Length; i++)
+			{
+				items[i] = listViewFiles.SelectedItems[i];
+			}
 			FileEntry entry;
-			try { entry = GetActiveFileEntry(); }
-			catch { return; }
+			for (int i = 0; i < items.Length; i++)
+			{
+				entry = items[i].Tag as FileEntry;
 			listViewFiles.Items.RemoveByKey(entry.ID.ToString());
 			entry.Delete();
 			entry.ReleaseID();
-			textBoxFileSize.Text = "";
+		}
 		}
 		private void listViewFiles_ItemActivate(object sender, EventArgs e)
 		{
