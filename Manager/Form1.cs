@@ -170,18 +170,18 @@ namespace Manager
 		/// This is needed so the stack won't overflow when resizing the columns, just ignore it.
 		/// </summary>
 		private bool ignoreResize = false;
-		private void listViewPasswords_ColumnWidthChanging(object sender, ColumnWidthChangingEventArgs e)
+		private void listViewDetails_ColumnWidthChanging(object sender, ColumnWidthChangingEventArgs e)
 		{
 			if (ignoreResize)
 				return;
 			ignoreResize = true;
-			Debug.WriteLine(listViewPasswords.ClientSize.Width);
-			int totalWdith = listViewPasswords.ClientSize.Width, index;
+			ListView list = sender as ListView;
+			int totalWdith = list.ClientSize.Width, index;
 			if (e.ColumnIndex == 0)
 				index = 1;
 			else
 				index = 0;
-			listViewPasswords.Columns[index].Width = totalWdith - listViewPasswords.Columns[e.ColumnIndex].Width;
+			list.Columns[index].Width = totalWdith - list.Columns[e.ColumnIndex].Width;
 			ignoreResize = false;
 		}
 		private void ButtonAdd_Click(object sender, EventArgs e)
