@@ -74,7 +74,7 @@ namespace Manager
 					AddFileEntry(file as FileEntry);
 					continue;
 				}
-				if(file.GetType() == typeof(TextEntry))
+				if (file.GetType() == typeof(TextEntry))
 				{
 					AddTextEntry(file as TextEntry);
 					continue;
@@ -310,7 +310,7 @@ namespace Manager
 				return false;
 			if (currentlyLoadedTextEntry.Text != textBoxBody.Text)
 				return true;
-			if(currentlyLoadedTextEntry.Title != textBoxTitle.Text)
+			if (currentlyLoadedTextEntry.Title != textBoxTitle.Text)
 				return true;
 			return false;
 		}
@@ -343,7 +343,7 @@ namespace Manager
 			textBoxBody.Text = "";
 			textBoxBody.ReadOnly = false;
 			textBoxTitle.Text = "Placeholder Title";
-			textBoxTitle.ReadOnly =false;
+			textBoxTitle.ReadOnly = false;
 		}
 		#endregion
 		#region FileStuff
