@@ -416,6 +416,8 @@ namespace Manager
 			entry.Import(dialogImport.FileName);
 			entry.Save();
 			AddFileEntry(entry);
+			if(_settings.DeleteImport)
+				File.Delete(dialogImport.FileName);
 		}
 		private void buttonExportFile_Click(object sender, EventArgs e)
 		{
