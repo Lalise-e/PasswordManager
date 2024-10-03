@@ -626,11 +626,23 @@ namespace Password
 		}
 	}
 	/// <summary>
-	/// Not Implemented
+	/// This is specific to the Windows Forms app.<br></br>
+	/// I really do not like putting it here but I am lazy and not having it in<br></br>
+	/// this assembly will cause problem or require extensive rewrites.
 	/// </summary>
 	[ClassType(FileType.MetaFile)]
 	public class MetaEntry : EncryptedFile
 	{
+		/// <summary>
+		/// Whether or not to delete the <see cref="FileEntry"/> after exporting.
+		/// </summary>
+		[PropertyID(0)]
+		public bool DeleteExport { get; set; } = false;
+		/// <summary>
+		/// Whether or not to delete the the original file after importing a <see cref="FileEntry"/>.
+		/// </summary>
+		[PropertyID(1)]
+		public bool DeleteImport { get; set; } = false;
 		public MetaEntry(byte[] key) : base(key)
 		{
 
