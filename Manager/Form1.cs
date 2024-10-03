@@ -452,6 +452,37 @@ namespace Manager
 			else
 				e.Effect = DragDropEffects.None;
 		}
+		private void listViewFiles_ItemDrag(object sender, ItemDragEventArgs e)
+		{
+			string tempFolder = Directory.GetCurrentDirectory() + "\\temp";
+			int selected = listViewFiles.SelectedItems.Count;
+			if (selected == 0)
+				return;
+			if (!Directory.Exists(tempFolder))
+			{
+				Directory.CreateDirectory(tempFolder);
+				DirectoryInfo info = new DirectoryInfo(tempFolder);
+				info.Attributes = FileAttributes.Hidden;
+			}
+			FileEntry[] selectedFiles = new FileEntry[selected];
+			string[] files = new string[selected];
+			for (int i = 0; i < selected; i++)
+			{
+				selectedFiles[i] = listViewFiles.SelectedItems[i].Tag as FileEntry;
+				files[i] = $"{tempFolder}\\{selectedFiles[i].OriginalFileName}";
+				selectedFiles[i].Export(files[i]);
+			}
+			DataObject dObject = new(DataFormats.FileDrop, files);
+			DragDropEffects s = DoDragDrop(dObject, DragDropEffects.Move);
+			if (_settings.DeleteExport)
+			{
+				for (int i = 0; i < selected; i++)
+				{
+					selectedFiles[i].Delete();
+					selectedFiles[i].ReleaseID();
+				}
+			}
+		}
 		#endregion
 		internal static void DisplayError(Exception e) => DisplayError(e.Message);
 		internal static void DisplayError(string message) => MessageBox.Show(message, "Error", MessageBoxButtons.OKCancel, MessageBoxIcon.Error);
