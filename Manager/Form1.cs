@@ -87,7 +87,7 @@ namespace Manager
 					AddTextEntry(file as TextEntry);
 					continue;
 				}
-				if(file.GetType() == typeof(Metafile))
+				if(file.GetType() == typeof(MetaEntry))
 				{
 					_settings = file as MetaEntry;
 					continue;
