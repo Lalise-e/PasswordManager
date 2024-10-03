@@ -51,6 +51,8 @@ namespace Manager
 			toolStripMenuItemBackground.Click += ToolStripMenuItemBackground_Click;
 			toolStripMenuItemIncognito.Click += ToolStripMenuItemIncognito_Click;
 			toolStripMenuItemPassword.Click += ToolStripMenuItemPassword_Click;
+			toolStripMenuItemDeleteImport.Click += ToolStripMenuItemDeleteImport_Click;
+			toolStripMenuItemDeleteExport.Click += ToolStripMenuItemDeleteExport_Click;
 			using (PasswordFetcher fetcher = new())
 			{
 				DialogResult result = fetcher.ShowDialog();
@@ -96,6 +98,12 @@ namespace Manager
 			}
 			if (_settings == null)
 				_settings = new(GetHash(MasterPassword));
+			LoadSettings();
+		}
+		private void LoadSettings()
+		{
+			toolStripMenuItemDeleteImport.Checked = _settings.DeleteImport;
+			toolStripMenuItemDeleteExport.Checked = _settings.DeleteExport;
 		}
 		private void ToolStripMenuItemIncognito_Click(object sender, EventArgs e)
 		{
@@ -156,6 +164,18 @@ namespace Manager
 				file.ChangeKey(GetHash(newPassword));
 			}
 			MasterPassword = newPassword;
+		}
+		private void ToolStripMenuItemDeleteImport_Click(object sender, EventArgs e)
+		{
+			toolStripMenuItemDeleteImport.Checked = !toolStripMenuItemDeleteImport.Checked;
+			_settings.DeleteImport = toolStripMenuItemDeleteImport.Checked;
+			_settings.Save();
+		}
+		private void ToolStripMenuItemDeleteExport_Click(object sender, EventArgs e)
+		{
+			toolStripMenuItemDeleteExport.Checked = !toolStripMenuItemDeleteExport.Checked;
+			_settings.DeleteExport = toolStripMenuItemDeleteExport.Checked;
+			_settings.Save();
 		}
 		#region PasswordStuff
 		private void AddPasswordEntry(PasswordEntry entry)
@@ -407,6 +427,12 @@ namespace Manager
 			if (r != DialogResult.OK)
 				return;
 			entry.Export(dialogExport.FileName);
+			if(_settings.DeleteExport)
+			{
+				listViewFiles.Items.RemoveByKey(entry.ID.ToString());
+				entry.Delete();
+				entry.ReleaseID();
+			}
 		}
 		private void buttonDeleteFile_Click(object sender, EventArgs e)
 		{
@@ -443,6 +469,10 @@ namespace Manager
 				entry.Import(file);
 				entry.Save();
 				AddFileEntry(entry);
+				if (_settings.DeleteImport)
+				{
+					File.Delete(files[i]);
+				}
 			}
 		}
 		private void listViewFiles_DragEnter(object sender, DragEventArgs e)
@@ -478,6 +508,7 @@ namespace Manager
 			{
 				for (int i = 0; i < selected; i++)
 				{
+					listViewFiles.Items.RemoveByKey(selectedFiles[i].ID.ToString());
 					selectedFiles[i].Delete();
 					selectedFiles[i].ReleaseID();
 				}

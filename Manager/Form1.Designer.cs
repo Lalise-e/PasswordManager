@@ -52,7 +52,8 @@ namespace Manager
 			toolStripMenuItemBackground = new System.Windows.Forms.ToolStripMenuItem();
 			toolStripMenuItemIncognito = new System.Windows.Forms.ToolStripMenuItem();
 			toolStripMenuItemPassword = new System.Windows.Forms.ToolStripMenuItem();
-			settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			toolStripMenuItemDeleteImport = new System.Windows.Forms.ToolStripMenuItem();
+			toolStripMenuItemDeleteExport = new System.Windows.Forms.ToolStripMenuItem();
 			buttonWebsite = new System.Windows.Forms.Button();
 			tabControl = new System.Windows.Forms.TabControl();
 			tabPagePasswords = new System.Windows.Forms.TabPage();
@@ -279,7 +280,7 @@ namespace Manager
 			// 
 			// toolStripMenuSettings
 			// 
-			toolStripMenuSettings.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { toolStripMenuItemFont, toolStripMenuItemBackground, toolStripMenuItemIncognito, toolStripMenuItemPassword, settingsToolStripMenuItem });
+			toolStripMenuSettings.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { toolStripMenuItemFont, toolStripMenuItemBackground, toolStripMenuItemIncognito, toolStripMenuItemPassword, toolStripMenuItemDeleteImport, toolStripMenuItemDeleteExport });
 			toolStripMenuSettings.Name = "toolStripMenuSettings";
 			toolStripMenuSettings.Size = new System.Drawing.Size(76, 24);
 			toolStripMenuSettings.Text = "Settings";
@@ -287,33 +288,39 @@ namespace Manager
 			// toolStripMenuItemFont
 			// 
 			toolStripMenuItemFont.Name = "toolStripMenuItemFont";
-			toolStripMenuItemFont.Size = new System.Drawing.Size(207, 26);
+			toolStripMenuItemFont.Size = new System.Drawing.Size(245, 26);
 			toolStripMenuItemFont.Text = "Font";
 			// 
 			// toolStripMenuItemBackground
 			// 
 			toolStripMenuItemBackground.Name = "toolStripMenuItemBackground";
-			toolStripMenuItemBackground.Size = new System.Drawing.Size(207, 26);
+			toolStripMenuItemBackground.Size = new System.Drawing.Size(245, 26);
 			toolStripMenuItemBackground.Text = "Background";
 			// 
 			// toolStripMenuItemIncognito
 			// 
 			toolStripMenuItemIncognito.CheckOnClick = true;
 			toolStripMenuItemIncognito.Name = "toolStripMenuItemIncognito";
-			toolStripMenuItemIncognito.Size = new System.Drawing.Size(207, 26);
+			toolStripMenuItemIncognito.Size = new System.Drawing.Size(245, 26);
 			toolStripMenuItemIncognito.Text = "Start in incognito";
 			// 
 			// toolStripMenuItemPassword
 			// 
 			toolStripMenuItemPassword.Name = "toolStripMenuItemPassword";
-			toolStripMenuItemPassword.Size = new System.Drawing.Size(207, 26);
+			toolStripMenuItemPassword.Size = new System.Drawing.Size(245, 26);
 			toolStripMenuItemPassword.Text = "Change Password";
 			// 
-			// settingsToolStripMenuItem
+			// toolStripMenuItemDeleteImport
 			// 
-			settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
-			settingsToolStripMenuItem.Size = new System.Drawing.Size(207, 26);
-			settingsToolStripMenuItem.Text = "Settings";
+			toolStripMenuItemDeleteImport.Name = "toolStripMenuItemDeleteImport";
+			toolStripMenuItemDeleteImport.Size = new System.Drawing.Size(245, 26);
+			toolStripMenuItemDeleteImport.Text = "Delete file after import";
+			// 
+			// toolStripMenuItemDeleteExport
+			// 
+			toolStripMenuItemDeleteExport.Name = "toolStripMenuItemDeleteExport";
+			toolStripMenuItemDeleteExport.Size = new System.Drawing.Size(245, 26);
+			toolStripMenuItemDeleteExport.Text = "Delete file after export";
 			// 
 			// buttonWebsite
 			// 
@@ -500,6 +507,7 @@ namespace Manager
 			listViewFiles.View = System.Windows.Forms.View.Details;
 			listViewFiles.ColumnWidthChanging += listViewDetails_ColumnWidthChanging;
 			listViewFiles.ItemActivate += listViewFiles_ItemActivate;
+			listViewFiles.ItemDrag += listViewFiles_ItemDrag;
 			listViewFiles.DragDrop += listViewFiles_DragDrop;
 			listViewFiles.DragEnter += listViewFiles_DragEnter;
 			// 
@@ -565,7 +573,6 @@ namespace Manager
         private System.Windows.Forms.Button buttonWebsite;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemIncognito;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemPassword;
-        private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
 		private System.Windows.Forms.TabControl tabControl;
 		private System.Windows.Forms.TabPage tabPagePasswords;
 		private System.Windows.Forms.TabPage tabPageTextEntries;
@@ -589,6 +596,8 @@ namespace Manager
 		private System.Windows.Forms.ColumnHeader columnHeaderFileName;
 		private System.Windows.Forms.ColumnHeader columnHeaderSize;
 		private System.Windows.Forms.ColumnHeader columnHeaderTextTitle;
+		private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemDeleteExport;
+		private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemDeleteImport;
 	}
 }
 
