@@ -13,7 +13,15 @@ namespace Manager
 	public partial class Form1 : Form
 	{
 		internal static string BackgroundDirectory { get { return $"{Directory.GetCurrentDirectory()}\\Images"; } }
-		internal static Settings settings { get; set; }
+		/// <summary>
+		/// Don't put more stuff in this, I am eventually gonna replace this<br></br>
+		/// Use <see cref="_settings"/> instead.
+		/// </summary>
+		internal static Settings settings_old { get; set; }
+		/// <summary>
+		/// Contains various settings and other information that needs to be saved.
+		/// </summary>
+		private MetaEntry _settings {  get; set; }
 		//internal static string BackgroundLocation { get { return $"{Directory.GetCurrentDirectory()}\\bg{settings.FileExtension}"; } }
 		private string SettingsFile { get { return $"{Directory.GetCurrentDirectory()}\\settings.json"; } }
 		private string EntryDirectory { get; set; } = $"{Directory.GetCurrentDirectory()}\\Entries";
@@ -33,12 +41,12 @@ namespace Manager
 			EncryptedFile.FileDirectory = EntryDirectory;
 			if (File.Exists(SettingsFile))
 			{
-				settings = Settings.GetSettings(SettingsFile);
+				settings_old = Settings.GetSettings(SettingsFile);
 				this.ApplySettings();
-				toolStripMenuItemIncognito.Checked = settings.Incognito;
+				toolStripMenuItemIncognito.Checked = settings_old.Incognito;
 			}
 			else
-				settings = new();
+				settings_old = new();
 			toolStripMenuItemFont.Click += ToolStripMenuItemFont_Click;
 			toolStripMenuItemBackground.Click += ToolStripMenuItemBackground_Click;
 			toolStripMenuItemIncognito.Click += ToolStripMenuItemIncognito_Click;
@@ -79,13 +87,20 @@ namespace Manager
 					AddTextEntry(file as TextEntry);
 					continue;
 				}
+				if(file.GetType() == typeof(Metafile))
+				{
+					_settings = file as MetaEntry;
+					continue;
+				}
 				throw new UnhandledTypeException("File type is not handled", file.GetType());
 			}
+			if (_settings == null)
+				_settings = new(GetHash(MasterPassword));
 		}
 		private void ToolStripMenuItemIncognito_Click(object sender, EventArgs e)
 		{
-			settings.Incognito = toolStripMenuItemIncognito.Checked;
-			Settings.SaveSettings(SettingsFile, settings);
+			settings_old.Incognito = toolStripMenuItemIncognito.Checked;
+			Settings.SaveSettings(SettingsFile, settings_old);
 		}
 		private void ToolStripMenuItemBackground_Click(object sender, EventArgs e)
 		{
@@ -100,8 +115,8 @@ namespace Manager
 					string file = $"{BackgroundDirectory}\\{GetHexString(hash)}{Path.GetExtension(dialog.FileName)}";
 					if (!File.Exists(file))
 						File.Copy(dialog.FileName, file);
-					settings.BackgroundLocation = file;
-					Settings.SaveSettings(SettingsFile, settings);
+					settings_old.BackgroundLocation = file;
+					Settings.SaveSettings(SettingsFile, settings_old);
 					this.ApplySettings();
 				}
 			}
@@ -113,8 +128,8 @@ namespace Manager
 				DialogResult result = dialog.ShowDialog();
 				if (result == DialogResult.OK)
 				{
-					settings.FontName = dialog.Font.FontFamily.Name;
-					Settings.SaveSettings(SettingsFile, settings);
+					settings_old.FontName = dialog.Font.FontFamily.Name;
+					Settings.SaveSettings(SettingsFile, settings_old);
 					this.ApplySettings();
 				}
 			}
@@ -133,6 +148,7 @@ namespace Manager
 			List<EncryptedFile> files = new(PasswordEntries);
 			files.AddRange(FileEntries);
 			files.AddRange(TextEntries);
+			files.Add(_settings);
 			//I swear to god if I have to go back at some point and make this into a for loop I will never make a
 			//foreach loop again.
 			foreach (EncryptedFile file in files)
@@ -236,7 +252,7 @@ namespace Manager
 				FileName = "firefox",
 				UseShellExecute = true
 			};
-			if (settings.Incognito)
+			if (settings_old.Incognito)
 			{
 				info.Arguments += "-private-window";
 			}

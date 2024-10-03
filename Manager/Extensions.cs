@@ -14,7 +14,7 @@ namespace Manager
     {
         public static void ApplySettings(this Form form)
         {
-            Settings settings = Form1.settings;
+            Settings settings = Form1.settings_old;
             ApplyFont(form, settings);
             ApplyBackground(form, settings);
         }
