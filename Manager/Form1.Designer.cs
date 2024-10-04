@@ -510,6 +510,7 @@ namespace Manager
 			listViewFiles.ItemDrag += listViewFiles_ItemDrag;
 			listViewFiles.DragDrop += listViewFiles_DragDrop;
 			listViewFiles.DragEnter += listViewFiles_DragEnter;
+			listViewFiles.KeyDown += listViewFiles_KeyDown;
 			// 
 			// columnHeaderFileName
 			// 

@@ -7,6 +7,7 @@ using System.Security.Cryptography;
 using System.Drawing;
 using System.Diagnostics;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Manager
 {
@@ -104,6 +105,12 @@ namespace Manager
 		{
 			toolStripMenuItemDeleteImport.Checked = _settings.DeleteImport;
 			toolStripMenuItemDeleteExport.Checked = _settings.DeleteExport;
+		}
+		protected override void OnClosing(CancelEventArgs e)
+		{
+			if(Directory.Exists(tempFolder))
+				Directory.Delete(tempFolder, true);
+			base.OnClosing(e);
 		}
 		private void ToolStripMenuItemIncognito_Click(object sender, EventArgs e)
 		{
@@ -383,6 +390,7 @@ namespace Manager
 		}
 		#endregion
 		#region FileStuff
+		private string tempFolder { get { return $"{Directory.GetCurrentDirectory()}\\temp"; } }
 		private FileEntry GetActiveFileEntry()
 		{
 			FileEntry entry;
@@ -438,19 +446,7 @@ namespace Manager
 		}
 		private void buttonDeleteFile_Click(object sender, EventArgs e)
 		{
-			ListViewItem[] items = new ListViewItem[listViewFiles.SelectedItems.Count];
-			for (int i = 0; i < items.Length; i++)
-			{
-				items[i] = listViewFiles.SelectedItems[i];
-			}
-			FileEntry entry;
-			for (int i = 0; i < items.Length; i++)
-			{
-				entry = items[i].Tag as FileEntry;
-				listViewFiles.Items.RemoveByKey(entry.ID.ToString());
-				entry.Delete();
-				entry.ReleaseID();
-			}
+			deleteSelectedFiles();
 		}
 		private void listViewFiles_ItemActivate(object sender, EventArgs e)
 		{
@@ -486,17 +482,102 @@ namespace Manager
 		}
 		private void listViewFiles_ItemDrag(object sender, ItemDragEventArgs e)
 		{
-			string tempFolder = Directory.GetCurrentDirectory() + "\\temp";
+			DataObject dObject = GetSelectedFiles(!_settings.DeleteExport, out FileEntry[] files);
+			if (dObject == null)
+				return;
+			DragDropEffects s = DoDragDrop(dObject, DragDropEffects.Move);
+			if (_settings.DeleteExport)
+			{
+				for (int i = 0; i < files.Length; i++)
+				{
+					listViewFiles.Items.RemoveByKey(files[i].ID.ToString());
+					files[i].Delete();
+					files[i].ReleaseID();
+				}
+			}
+		}
+		private void listViewFiles_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.Control)
+			{
+				e.SuppressKeyPress = true;
+				switch (e.KeyCode)
+				{
+					case Keys.A:
+						selectAllItems(sender as ListView);
+						break;
+					case Keys.C:
+						copyFileOut();
+						break;
+					case Keys.V:
+						pasteFilesIn();
+						break;
+				}
+			}
+			else if (!e.Shift && !e.Alt && e.KeyCode == Keys.Delete)
+				deleteSelectedFiles();
+		}
+		private void copyFileOut()
+		{
+			DataObject dObject = GetSelectedFiles(true, out FileEntry[] dump);
+			if (dObject == null)
+				return;
+			System.Collections.Specialized.StringCollection strings = new();
+			for (int i = 0; i < dump.Length; i++)
+			{
+				strings.Add($"{tempFolder}\\{dump[i].OriginalFileName}");
+			}
+			Clipboard.SetFileDropList(strings);
+		}
+		private void pasteFilesIn()
+		{
+			if (!Clipboard.ContainsFileDropList())
+				return;
+			System.Collections.Specialized.StringCollection strings = Clipboard.GetFileDropList();
+			for (int i = 0; i < strings.Count; i++)
+			{
+				FileEntry entry = new(GetHash(MasterPassword));
+				entry.FileSource = strings[i];
+				entry.Import();
+				entry.Save();
+				AddFileEntry(entry);
+			}
+		}
+		private void selectAllItems(ListView view)
+		{
+			for (int i = 0; i < view.Items.Count; i++)
+			{
+				view.Items[i].Selected = true;
+			}
+		}
+		private void deleteSelectedFiles()
+		{
+			ListViewItem[] items = new ListViewItem[listViewFiles.SelectedItems.Count];
+			for (int i = 0; i < items.Length; i++)
+			{
+				items[i] = listViewFiles.SelectedItems[i];
+			}
+			FileEntry entry;
+			for (int i = 0; i < items.Length; i++)
+			{
+				entry = items[i].Tag as FileEntry;
+				listViewFiles.Items.RemoveByKey(entry.ID.ToString());
+				entry.Delete();
+				entry.ReleaseID();
+			}
+		}
+		private DataObject GetSelectedFiles(bool copy, out FileEntry[] selectedFiles)
+		{
+			selectedFiles = null;
 			int selected = listViewFiles.SelectedItems.Count;
 			if (selected == 0)
-				return;
-			if (!Directory.Exists(tempFolder))
-			{
-				Directory.CreateDirectory(tempFolder);
-				DirectoryInfo info = new DirectoryInfo(tempFolder);
-				info.Attributes = FileAttributes.Hidden;
-			}
-			FileEntry[] selectedFiles = new FileEntry[selected];
+				return null;
+			if (Directory.Exists(tempFolder))
+				Directory.Delete(tempFolder, true);
+			Directory.CreateDirectory(tempFolder);
+			DirectoryInfo info = new DirectoryInfo(tempFolder);
+			info.Attributes = FileAttributes.Hidden;
+			selectedFiles = new FileEntry[selected];
 			string[] files = new string[selected];
 			for (int i = 0; i < selected; i++)
 			{
@@ -504,17 +585,7 @@ namespace Manager
 				files[i] = $"{tempFolder}\\{selectedFiles[i].OriginalFileName}";
 				selectedFiles[i].Export(files[i]);
 			}
-			DataObject dObject = new(DataFormats.FileDrop, files);
-			DragDropEffects s = DoDragDrop(dObject, DragDropEffects.Move);
-			if (_settings.DeleteExport)
-			{
-				for (int i = 0; i < selected; i++)
-				{
-					listViewFiles.Items.RemoveByKey(selectedFiles[i].ID.ToString());
-					selectedFiles[i].Delete();
-					selectedFiles[i].ReleaseID();
-				}
-			}
+			return new(DataFormats.FileDrop, files);
 		}
 		#endregion
 		internal static void DisplayError(Exception e) => DisplayError(e.Message);
