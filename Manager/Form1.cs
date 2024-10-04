@@ -21,7 +21,7 @@ namespace Manager
 		/// <summary>
 		/// Contains various settings and other information that needs to be saved.
 		/// </summary>
-		private MetaEntry _settings {  get; set; }
+		private MetaEntry _settings { get; set; }
 		//internal static string BackgroundLocation { get { return $"{Directory.GetCurrentDirectory()}\\bg{settings.FileExtension}"; } }
 		private string SettingsFile { get { return $"{Directory.GetCurrentDirectory()}\\settings.json"; } }
 		private string EntryDirectory { get; set; } = $"{Directory.GetCurrentDirectory()}\\Entries";
@@ -89,7 +89,7 @@ namespace Manager
 					AddTextEntry(file as TextEntry);
 					continue;
 				}
-				if(file.GetType() == typeof(MetaEntry))
+				if (file.GetType() == typeof(MetaEntry))
 				{
 					_settings = file as MetaEntry;
 					continue;
@@ -416,7 +416,7 @@ namespace Manager
 			entry.Import(dialogImport.FileName);
 			entry.Save();
 			AddFileEntry(entry);
-			if(_settings.DeleteImport)
+			if (_settings.DeleteImport)
 				File.Delete(dialogImport.FileName);
 		}
 		private void buttonExportFile_Click(object sender, EventArgs e)
@@ -429,7 +429,7 @@ namespace Manager
 			if (r != DialogResult.OK)
 				return;
 			entry.Export(dialogExport.FileName);
-			if(_settings.DeleteExport)
+			if (_settings.DeleteExport)
 			{
 				listViewFiles.Items.RemoveByKey(entry.ID.ToString());
 				entry.Delete();
