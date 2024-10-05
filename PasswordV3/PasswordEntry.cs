@@ -689,6 +689,7 @@ namespace Password
 		/// </summary>
 		[PropertyID(3)]
 		public string EncryptedSize { get; set; }
+		public long InnerSize { get { return new FileInfo(_path).Length; } }
 		private string _filename;
 		private string _path { get { return $"{_subPath}\\{Convert.ToHexString(BitConverter.GetBytes(ID))}.dump"; } }
 		private string _subPath { get { return $"{FileDirectory}\\Files"; } }
@@ -712,18 +713,6 @@ namespace Password
 			if(File.Exists(_path))
 				File.Delete(_path);
 			base.Delete();
-		}
-		public static string GetFileSize(string file)
-		{
-			string prefix = "B";
-			char[] prefixes = new char[] { 'k', 'M', 'G', 'T', 'P', 'E' };
-			double divisor = 1;
-			long length = new FileInfo(file).Length;
-			double exponent = Math.Log2(length);
-			divisor = Math.Pow(2, ((int)exponent / 10) * 10);
-			if (exponent >= 10)
-				prefix = prefixes[((int)exponent / 10) - 1] + prefix;
-			return string.Format("{1} {0:00}", prefix, Math.Round(length / divisor, 2));
 		}
 		/// <summary>
 		/// Encrypts <see cref="FileSource"/> and then executes <see cref="EncryptedFile.Save"/>
@@ -784,6 +773,22 @@ namespace Password
 			}
 			locationStream.Close();
 			locationStream.Dispose();
+		}
+		public static string GetFileSize(string file)
+		{
+			long length = new FileInfo(file).Length;
+			return GetFileSize(length);
+		}
+		public static string GetFileSize(long length)
+		{
+			string prefix = "B";
+			char[] prefixes = new char[] { 'k', 'M', 'G', 'T', 'P', 'E' };
+			double divisor = 1;
+			double exponent = Math.Log2(length);
+			divisor = Math.Pow(2, ((int)exponent / 10) * 10);
+			if (exponent >= 10)
+				prefix = prefixes[((int)exponent / 10) - 1] + prefix;
+			return string.Format("{1} {0:00}", prefix, Math.Round(length / divisor, 2));
 		}
 	}
 }

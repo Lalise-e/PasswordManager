@@ -448,12 +448,19 @@ namespace Manager
 		{
 			deleteSelectedFiles();
 		}
-		private void listViewFiles_ItemActivate(object sender, EventArgs e)
+		private void listViewFiles_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			FileEntry entry;
-			try { entry = GetActiveFileEntry(); }
-			catch { return; }
-			textBoxFileSize.Text = entry.OriginalSize.ToString();
+			long size = 0;
+			for (int i = 0; i < listViewFiles.SelectedItems.Count; i++)
+			{
+				size += (listViewFiles.SelectedItems[i].Tag as FileEntry).InnerSize;
+			}
+			if(size == 0)
+			{
+				textBoxFileSize.Text = string.Empty;
+				return;
+			}
+			textBoxFileSize.Text = FileEntry.GetFileSize(size);
 		}
 		private void listViewFiles_DragDrop(object sender, DragEventArgs e)
 		{

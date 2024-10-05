@@ -506,8 +506,8 @@ namespace Manager
 			listViewFiles.UseCompatibleStateImageBehavior = false;
 			listViewFiles.View = System.Windows.Forms.View.Details;
 			listViewFiles.ColumnWidthChanging += listViewDetails_ColumnWidthChanging;
-			listViewFiles.ItemActivate += listViewFiles_ItemActivate;
 			listViewFiles.ItemDrag += listViewFiles_ItemDrag;
+			listViewFiles.SelectedIndexChanged += listViewFiles_SelectedIndexChanged;
 			listViewFiles.DragDrop += listViewFiles_DragDrop;
 			listViewFiles.DragEnter += listViewFiles_DragEnter;
 			listViewFiles.KeyDown += listViewFiles_KeyDown;
