@@ -105,6 +105,10 @@ namespace Manager
 		{
 			toolStripMenuItemDeleteImport.Checked = _settings.DeleteImport;
 			toolStripMenuItemDeleteExport.Checked = _settings.DeleteExport;
+			if (_settings.ListViewWidthFiles != 0)
+				listViewFiles.Columns[0].Width = _settings.ListViewWidthFiles;
+			if(_settings.ListViewWidthPassword != 0)
+				listViewPasswords.Columns[0].Width = _settings.ListViewWidthPassword;
 		}
 		protected override void OnClosing(CancelEventArgs e)
 		{
@@ -226,6 +230,11 @@ namespace Manager
 				index = 0;
 			list.Columns[index].Width = totalWdith - list.Columns[e.ColumnIndex].Width;
 			ignoreResize = false;
+			if (sender == listViewFiles)
+				_settings.ListViewWidthFiles = list.Columns[0].Width;
+			if (sender == listViewPasswords)
+				_settings.ListViewWidthPassword = list.Columns[0].Width;
+			_settings.Save();
 		}
 		private void ButtonAdd_Click(object sender, EventArgs e)
 		{

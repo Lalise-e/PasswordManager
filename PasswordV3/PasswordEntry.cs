@@ -95,6 +95,11 @@ namespace Password
 					info.SetValue(this, StringToBool(idAndProp[1]));
 					continue;
 				}
+				if(pType == typeof(int))
+				{
+					info.SetValue(this, Base64ToInt(idAndProp[1]));
+					continue;
+				}
 				throw new UnhandledTypeException("Decoding for type is not handled.", pType);
 			}
 		}
@@ -220,7 +225,12 @@ namespace Password
 					result += BoolToString((bool)ob);
 					continue;
 				}
-				throw new UnhandledTypeException("Encoding for type is not handled.", objectType);
+				if (objectType == typeof(int))
+				{
+					result += IntToBase64((int)ob);
+					continue;
+				}
+				throw new UnhandledTypeException($"Encoding for {objectType.Name} is not handled.", objectType);
 			}
 			return result;
 		}
@@ -245,6 +255,14 @@ namespace Password
 		protected short Base64ToShort(string encodedString)
 		{
 			return BitConverter.ToInt16(Base64ToByteArray(encodedString));
+		}
+		protected string IntToBase64(int value)
+		{
+			return ByteArrayToBase64(BitConverter.GetBytes(value));
+		}
+		protected int Base64ToInt(string encodedString)
+		{
+			return BitConverter.ToInt32(Base64ToByteArray(encodedString));
 		}
 		protected string BoolToString(bool value)
 		{
@@ -643,6 +661,16 @@ namespace Password
 		/// </summary>
 		[PropertyID(1)]
 		public bool DeleteImport { get; set; } = false;
+		/// <summary>
+		/// The width of the first collumn
+		/// </summary>
+		[PropertyID(2)]
+		public int ListViewWidthFiles { get; set; }
+		/// <summary>
+		/// The width of the first collumn
+		/// </summary>
+		[PropertyID(3)]
+		public int ListViewWidthPassword {  get; set; }
 		public MetaEntry(byte[] key) : base(key)
 		{
 
