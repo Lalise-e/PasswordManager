@@ -107,12 +107,12 @@ namespace Manager
 			toolStripMenuItemDeleteExport.Checked = _settings.DeleteExport;
 			if (_settings.ListViewWidthFiles != 0)
 				listViewFiles.Columns[0].Width = _settings.ListViewWidthFiles;
-			if(_settings.ListViewWidthPassword != 0)
+			if (_settings.ListViewWidthPassword != 0)
 				listViewPasswords.Columns[0].Width = _settings.ListViewWidthPassword;
 		}
 		protected override void OnClosing(CancelEventArgs e)
 		{
-			if(Directory.Exists(tempFolder))
+			if (Directory.Exists(tempFolder))
 				Directory.Delete(tempFolder, true);
 			base.OnClosing(e);
 		}
@@ -464,7 +464,7 @@ namespace Manager
 			{
 				size += (listViewFiles.SelectedItems[i].Tag as FileEntry).InnerSize;
 			}
-			if(size == 0)
+			if (size == 0)
 			{
 				textBoxFileSize.Text = string.Empty;
 				return;
