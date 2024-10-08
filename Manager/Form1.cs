@@ -381,6 +381,28 @@ namespace Manager
 			};
 			return item;
 		}
+		private ListViewItem GetActiveText()
+		{
+			if (listViewText.SelectedItems.Count == 0)
+				return null;
+			return listViewText.SelectedItems[0];
+		}
+		private void LoadTextEntry(TextEntry entry)
+		{
+			currentlyLoadedTextEntry = entry;
+			if (currentlyLoadedTextEntry == null)
+			{
+				textBoxTitle.ReadOnly = true;
+				textBoxBody.ReadOnly = true;
+			}
+			else
+			{
+				textBoxTitle.ReadOnly = false;
+				textBoxBody.ReadOnly = false;
+			}
+			textBoxBody.Text = currentlyLoadedTextEntry.Text;
+			textBoxTitle.Text = currentlyLoadedTextEntry.Title;
+		}
 		private void buttonNewText_Click(object sender, EventArgs e)
 		{
 			TextEntry entry = new(GetHash(MasterPassword))
@@ -389,13 +411,19 @@ namespace Manager
 			};
 			if (NeedSavePrompt())
 				PromptSave();
-			currentlyLoadedTextEntry = entry;
 			AddTextEntry(entry);
 			entry.Save();
-			textBoxBody.Text = "";
-			textBoxBody.ReadOnly = false;
-			textBoxTitle.Text = "Placeholder Title";
-			textBoxTitle.ReadOnly = false;
+			LoadTextEntry(entry);
+		}
+		private void listViewText_ItemActivate(object sender, EventArgs e)
+		{
+			ListViewItem selected = GetActiveText();
+			if (selected == null || selected.Tag == currentlyLoadedTextEntry)
+				return;
+			if (NeedSavePrompt())
+				PromptSave();
+			LoadTextEntry(selected.Tag as TextEntry);
+
 		}
 		#endregion
 		#region FileStuff
