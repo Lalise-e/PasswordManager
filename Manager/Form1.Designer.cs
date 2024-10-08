@@ -386,6 +386,7 @@ namespace Manager
 			buttonSaveText.TabIndex = 5;
 			buttonSaveText.Text = "Save";
 			buttonSaveText.UseVisualStyleBackColor = true;
+			buttonSaveText.Click += buttonSaveText_Click;
 			// 
 			// textBoxBody
 			// 
@@ -414,6 +415,7 @@ namespace Manager
 			buttonDeleteText.TabIndex = 2;
 			buttonDeleteText.Text = "Delete";
 			buttonDeleteText.UseVisualStyleBackColor = true;
+			buttonDeleteText.Click += buttonDeleteText_Click;
 			// 
 			// buttonNewText
 			// 
@@ -431,9 +433,11 @@ namespace Manager
 			listViewText.Location = new System.Drawing.Point(6, 76);
 			listViewText.Name = "listViewText";
 			listViewText.Size = new System.Drawing.Size(192, 355);
+			listViewText.Sorting = System.Windows.Forms.SortOrder.Ascending;
 			listViewText.TabIndex = 0;
 			listViewText.UseCompatibleStateImageBehavior = false;
 			listViewText.View = System.Windows.Forms.View.Details;
+			listViewText.ItemActivate += listViewText_ItemActivate;
 			// 
 			// columnHeaderTextTitle
 			// 

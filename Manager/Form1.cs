@@ -353,8 +353,7 @@ namespace Manager
 			currentlyLoadedTextEntry.Text = textBoxBody.Text;
 			currentlyLoadedTextEntry.Title = textBoxTitle.Text;
 			currentlyLoadedTextEntry.Save();
-			listViewText.Items.RemoveByKey(currentlyLoadedTextEntry.ID.ToString());
-			listViewText.Items.Add(MakeTextListItem(currentlyLoadedTextEntry));
+			listViewText.Items[currentlyLoadedTextEntry.ID.ToString()].Text = currentlyLoadedTextEntry.Title;
 		}
 		private bool NeedSavePrompt()
 		{
@@ -393,15 +392,15 @@ namespace Manager
 			if (currentlyLoadedTextEntry == null)
 			{
 				textBoxTitle.ReadOnly = true;
+				textBoxTitle.Text = "";
 				textBoxBody.ReadOnly = true;
+				textBoxBody.Text = "";
+				return;
 			}
-			else
-			{
-				textBoxTitle.ReadOnly = false;
-				textBoxBody.ReadOnly = false;
-			}
-			textBoxBody.Text = currentlyLoadedTextEntry.Text;
+			textBoxTitle.ReadOnly = false;
 			textBoxTitle.Text = currentlyLoadedTextEntry.Title;
+			textBoxBody.ReadOnly = false;
+			textBoxBody.Text = currentlyLoadedTextEntry.Text;
 		}
 		private void buttonNewText_Click(object sender, EventArgs e)
 		{
@@ -414,6 +413,36 @@ namespace Manager
 			AddTextEntry(entry);
 			entry.Save();
 			LoadTextEntry(entry);
+			foreach(ListViewItem l in  listViewText.SelectedItems)
+			{
+				l.Selected = false;
+			}
+			listViewText.Items[entry.ID.ToString()].Selected = true;
+		}
+		private void buttonSaveText_Click(object sender, EventArgs e)
+		{
+			if (currentlyLoadedTextEntry == null)
+				return;
+			currentlyLoadedTextEntry.Text = textBoxBody.Text;
+			currentlyLoadedTextEntry.Title = textBoxTitle.Text;
+			currentlyLoadedTextEntry.Save();
+			listViewText.Items[currentlyLoadedTextEntry.ID.ToString()].Text = currentlyLoadedTextEntry.Title;
+		}
+		private void buttonDeleteText_Click(object sender, EventArgs e)
+		{
+			ListViewItem item = GetActiveText();
+			TextEntry entry = item.Tag as TextEntry;
+			if (item == null)
+				return;
+			DialogResult r = MessageBox.Show($"Are you sure you want to delete {entry.Title}?",
+				"Delete?", MessageBoxButtons.YesNo);
+			if (r == DialogResult.No)
+				return;
+			listViewText.Items.Remove(item);
+			if (currentlyLoadedTextEntry == entry)
+				LoadTextEntry(null);
+			entry.Delete();
+			entry.ReleaseID();
 		}
 		private void listViewText_ItemActivate(object sender, EventArgs e)
 		{
@@ -423,7 +452,6 @@ namespace Manager
 			if (NeedSavePrompt())
 				PromptSave();
 			LoadTextEntry(selected.Tag as TextEntry);
-
 		}
 		#endregion
 		#region FileStuff
