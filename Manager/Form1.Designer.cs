@@ -75,7 +75,7 @@ namespace Manager
 			columnHeaderSize = new System.Windows.Forms.ColumnHeader();
 			dialogImport = new System.Windows.Forms.OpenFileDialog();
 			dialogExport = new System.Windows.Forms.SaveFileDialog();
-			textBoxEmail = new System.Windows.Forms.TextBox();
+			textBoxInfoEmail = new System.Windows.Forms.TextBox();
 			labelEmail = new System.Windows.Forms.Label();
 			infoPanel.SuspendLayout();
 			menuStrip1.SuspendLayout();
@@ -90,7 +90,7 @@ namespace Manager
 			infoPanel.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
 			infoPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
 			infoPanel.Controls.Add(labelEmail);
-			infoPanel.Controls.Add(textBoxEmail);
+			infoPanel.Controls.Add(textBoxInfoEmail);
 			infoPanel.Controls.Add(textBoxInfoPassword);
 			infoPanel.Controls.Add(infoPasswordLabel);
 			infoPanel.Controls.Add(infoDomainLabel);
@@ -532,13 +532,13 @@ namespace Manager
 			// 
 			// textBoxEmail
 			// 
-			textBoxEmail.Location = new System.Drawing.Point(-1, 111);
-			textBoxEmail.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
-			textBoxEmail.Name = "textBoxEmail";
-			textBoxEmail.PasswordChar = '*';
-			textBoxEmail.ReadOnly = true;
-			textBoxEmail.Size = new System.Drawing.Size(252, 27);
-			textBoxEmail.TabIndex = 8;
+			textBoxInfoEmail.Location = new System.Drawing.Point(-1, 111);
+			textBoxInfoEmail.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+			textBoxInfoEmail.Name = "textBoxEmail";
+			textBoxInfoEmail.PasswordChar = '*';
+			textBoxInfoEmail.ReadOnly = true;
+			textBoxInfoEmail.Size = new System.Drawing.Size(252, 27);
+			textBoxInfoEmail.TabIndex = 8;
 			// 
 			// labelEmail
 			// 
@@ -628,7 +628,7 @@ namespace Manager
 		private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemDeleteExport;
 		private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemDeleteImport;
 		private System.Windows.Forms.Label labelEmail;
-		private System.Windows.Forms.TextBox textBoxEmail;
+		private System.Windows.Forms.TextBox textBoxInfoEmail;
 	}
 }
 
