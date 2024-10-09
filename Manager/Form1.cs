@@ -314,6 +314,7 @@ namespace Manager
 				textBoxInfoDomain.Text = null;
 			textBoxInfoPassword.Text = entry.Password;
 			textBoxInfoService.Text = entry.Service;
+			textBoxInfoEmail.Text = entry.Email;
 		}
 		private void ClearInfo()
 		{
