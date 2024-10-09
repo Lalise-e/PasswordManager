@@ -9,7 +9,6 @@ namespace Manager
         public PasswordFetcher()
         {
             InitializeComponent();
-            this.ApplySettings();
         }
         private void buttonOk_Click(object sender, EventArgs e)
         {

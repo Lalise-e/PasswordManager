@@ -31,5 +31,13 @@ namespace Manager
          }
          EncryptedFile.ReleaseIDs();
       }
+      public static void SettingsFileToMetaEntry(MetaEntry entry, string path)
+      {
+         Settings_old old = Settings_old.GetSettings(path);
+         entry.BackgroundLocation = old.BackgroundLocation;
+         entry.Incognito = old.Incognito;
+         entry.FontName = old.FontName;
+         entry.Save();
+      }
    }
 }

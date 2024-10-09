@@ -16,14 +16,16 @@ namespace Manager
 		internal static string BackgroundDirectory { get { return $"{Directory.GetCurrentDirectory()}\\Images"; } }
 		/// <summary>
 		/// Don't put more stuff in this, I am eventually gonna replace this<br></br>
-		/// Use <see cref="_settings"/> instead.
+		/// Use <see cref="Settings"/> instead.
 		/// </summary>
-		internal static Settings_old settings_old { get; set; }
+		//internal static Settings_old settings_old { get; set; }
 		/// <summary>
 		/// Contains various settings and other information that needs to be saved.
 		/// </summary>
-		private MetaEntry _settings { get; set; }
-		//internal static string BackgroundLocation { get { return $"{Directory.GetCurrentDirectory()}\\bg{settings.FileExtension}"; } }
+		public MetaEntry Settings { get; set; }
+		/// <summary>
+		/// Deprecated file, should not exist and do not use it.
+		/// </summary>
 		private string SettingsFile { get { return $"{Directory.GetCurrentDirectory()}\\settings.json"; } }
 		private string EntryDirectory { get; set; } = $"{Directory.GetCurrentDirectory()}\\Entries";
 		private string MasterPassword { get; set; }
@@ -40,14 +42,6 @@ namespace Manager
 			Directory.CreateDirectory(EntryDirectory);
 			Directory.CreateDirectory(BackgroundDirectory);
 			EncryptedFile.FileDirectory = EntryDirectory;
-			if (File.Exists(SettingsFile))
-			{
-				settings_old = Settings_old.GetSettings(SettingsFile);
-				this.ApplySettings();
-				toolStripMenuItemIncognito.Checked = settings_old.Incognito;
-			}
-			else
-				settings_old = new();
 			toolStripMenuItemFont.Click += ToolStripMenuItemFont_Click;
 			toolStripMenuItemBackground.Click += ToolStripMenuItemBackground_Click;
 			toolStripMenuItemIncognito.Click += ToolStripMenuItemIncognito_Click;
@@ -92,23 +86,31 @@ namespace Manager
 				}
 				if (file.GetType() == typeof(MetaEntry))
 				{
-					_settings = file as MetaEntry;
+					Settings = file as MetaEntry;
 					continue;
 				}
 				throw new UnhandledTypeException("File type is not handled", file.GetType());
 			}
-			if (_settings == null)
-				_settings = new(GetHash(MasterPassword));
+			if (Settings == null)
+				Settings = new(GetHash(MasterPassword));
+			Extensions.settings = Settings;
 			LoadSettings();
 		}
 		private void LoadSettings()
 		{
-			toolStripMenuItemDeleteImport.Checked = _settings.DeleteImport;
-			toolStripMenuItemDeleteExport.Checked = _settings.DeleteExport;
-			if (_settings.ListViewWidthFiles != 0)
-				listViewFiles.Columns[0].Width = _settings.ListViewWidthFiles;
-			if (_settings.ListViewWidthPassword != 0)
-				listViewPasswords.Columns[0].Width = _settings.ListViewWidthPassword;
+			if (File.Exists(SettingsFile))
+			{
+				PasswordPatcher.SettingsFileToMetaEntry(Settings, SettingsFile);
+				File.Delete(SettingsFile);
+			}
+			toolStripMenuItemIncognito.Checked = Settings.Incognito;
+			toolStripMenuItemDeleteImport.Checked = Settings.DeleteImport;
+			toolStripMenuItemDeleteExport.Checked = Settings.DeleteExport;
+			if (Settings.ListViewWidthFiles != 0)
+				listViewFiles.Columns[0].Width = Settings.ListViewWidthFiles;
+			if (Settings.ListViewWidthPassword != 0)
+				listViewPasswords.Columns[0].Width = Settings.ListViewWidthPassword;
+			this.ApplySettings();
 		}
 		protected override void OnClosing(CancelEventArgs e)
 		{
@@ -118,8 +120,8 @@ namespace Manager
 		}
 		private void ToolStripMenuItemIncognito_Click(object sender, EventArgs e)
 		{
-			settings_old.Incognito = toolStripMenuItemIncognito.Checked;
-			Settings_old.SaveSettings(SettingsFile, settings_old);
+			Settings.Incognito = toolStripMenuItemIncognito.Checked;
+			Settings.Save();
 		}
 		private void ToolStripMenuItemBackground_Click(object sender, EventArgs e)
 		{
@@ -134,8 +136,8 @@ namespace Manager
 					string file = $"{BackgroundDirectory}\\{GetHexString(hash)}{Path.GetExtension(dialog.FileName)}";
 					if (!File.Exists(file))
 						File.Copy(dialog.FileName, file);
-					settings_old.BackgroundLocation = file;
-					Settings_old.SaveSettings(SettingsFile, settings_old);
+					Settings.BackgroundLocation = file;
+					Settings.Save();
 					this.ApplySettings();
 				}
 			}
@@ -147,8 +149,8 @@ namespace Manager
 				DialogResult result = dialog.ShowDialog();
 				if (result == DialogResult.OK)
 				{
-					settings_old.FontName = dialog.Font.FontFamily.Name;
-					Settings_old.SaveSettings(SettingsFile, settings_old);
+					Settings.FontName = dialog.Font.FontFamily.Name;
+					Settings.Save();
 					this.ApplySettings();
 				}
 			}
@@ -167,7 +169,7 @@ namespace Manager
 			List<EncryptedFile> files = new(PasswordEntries);
 			files.AddRange(FileEntries);
 			files.AddRange(TextEntries);
-			files.Add(_settings);
+			files.Add(Settings);
 			//I swear to god if I have to go back at some point and make this into a for loop I will never make a
 			//foreach loop again.
 			foreach (EncryptedFile file in files)
@@ -179,14 +181,14 @@ namespace Manager
 		private void ToolStripMenuItemDeleteImport_Click(object sender, EventArgs e)
 		{
 			toolStripMenuItemDeleteImport.Checked = !toolStripMenuItemDeleteImport.Checked;
-			_settings.DeleteImport = toolStripMenuItemDeleteImport.Checked;
-			_settings.Save();
+			Settings.DeleteImport = toolStripMenuItemDeleteImport.Checked;
+			Settings.Save();
 		}
 		private void ToolStripMenuItemDeleteExport_Click(object sender, EventArgs e)
 		{
 			toolStripMenuItemDeleteExport.Checked = !toolStripMenuItemDeleteExport.Checked;
-			_settings.DeleteExport = toolStripMenuItemDeleteExport.Checked;
-			_settings.Save();
+			Settings.DeleteExport = toolStripMenuItemDeleteExport.Checked;
+			Settings.Save();
 		}
 		#region PasswordStuff
 		private void AddPasswordEntry(PasswordEntry entry)
@@ -231,10 +233,10 @@ namespace Manager
 			list.Columns[index].Width = totalWdith - list.Columns[e.ColumnIndex].Width;
 			ignoreResize = false;
 			if (sender == listViewFiles)
-				_settings.ListViewWidthFiles = list.Columns[0].Width;
+				Settings.ListViewWidthFiles = list.Columns[0].Width;
 			if (sender == listViewPasswords)
-				_settings.ListViewWidthPassword = list.Columns[0].Width;
-			_settings.Save();
+				Settings.ListViewWidthPassword = list.Columns[0].Width;
+			Settings.Save();
 		}
 		private void ButtonAdd_Click(object sender, EventArgs e)
 		{
@@ -288,7 +290,7 @@ namespace Manager
 				FileName = "firefox",
 				UseShellExecute = true
 			};
-			if (settings_old.Incognito)
+			if (Settings.Incognito)
 			{
 				info.Arguments += "-private-window";
 			}
@@ -490,7 +492,7 @@ namespace Manager
 			entry.Import(dialogImport.FileName);
 			entry.Save();
 			AddFileEntry(entry);
-			if (_settings.DeleteImport)
+			if (Settings.DeleteImport)
 				File.Delete(dialogImport.FileName);
 		}
 		private void buttonExportFile_Click(object sender, EventArgs e)
@@ -503,7 +505,7 @@ namespace Manager
 			if (r != DialogResult.OK)
 				return;
 			entry.Export(dialogExport.FileName);
-			if (_settings.DeleteExport)
+			if (Settings.DeleteExport)
 			{
 				listViewFiles.Items.RemoveByKey(entry.ID.ToString());
 				entry.Delete();
@@ -540,7 +542,7 @@ namespace Manager
 				entry.Import(file);
 				entry.Save();
 				AddFileEntry(entry);
-				if (_settings.DeleteImport)
+				if (Settings.DeleteImport)
 				{
 					File.Delete(files[i]);
 				}
@@ -555,11 +557,11 @@ namespace Manager
 		}
 		private void listViewFiles_ItemDrag(object sender, ItemDragEventArgs e)
 		{
-			DataObject dObject = GetSelectedFiles(!_settings.DeleteExport, out FileEntry[] files);
+			DataObject dObject = GetSelectedFiles(!Settings.DeleteExport, out FileEntry[] files);
 			if (dObject == null)
 				return;
 			DragDropEffects s = DoDragDrop(dObject, DragDropEffects.Move);
-			if (_settings.DeleteExport)
+			if (Settings.DeleteExport)
 			{
 				for (int i = 0; i < files.Length; i++)
 				{

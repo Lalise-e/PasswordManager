@@ -30,6 +30,8 @@ namespace Manager
 		private void InitializeComponent()
 		{
 			infoPanel = new System.Windows.Forms.Panel();
+			labelEmail = new System.Windows.Forms.Label();
+			textBoxInfoEmail = new System.Windows.Forms.TextBox();
 			textBoxInfoPassword = new System.Windows.Forms.TextBox();
 			infoPasswordLabel = new System.Windows.Forms.Label();
 			infoDomainLabel = new System.Windows.Forms.Label();
@@ -75,8 +77,6 @@ namespace Manager
 			columnHeaderSize = new System.Windows.Forms.ColumnHeader();
 			dialogImport = new System.Windows.Forms.OpenFileDialog();
 			dialogExport = new System.Windows.Forms.SaveFileDialog();
-			textBoxInfoEmail = new System.Windows.Forms.TextBox();
-			labelEmail = new System.Windows.Forms.Label();
 			infoPanel.SuspendLayout();
 			menuStrip1.SuspendLayout();
 			tabControl.SuspendLayout();
@@ -104,6 +104,26 @@ namespace Manager
 			infoPanel.Name = "infoPanel";
 			infoPanel.Size = new System.Drawing.Size(252, 232);
 			infoPanel.TabIndex = 0;
+			// 
+			// labelEmail
+			// 
+			labelEmail.AutoSize = true;
+			labelEmail.Location = new System.Drawing.Point(-1, 90);
+			labelEmail.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+			labelEmail.Name = "labelEmail";
+			labelEmail.Size = new System.Drawing.Size(46, 20);
+			labelEmail.TabIndex = 9;
+			labelEmail.Text = "Email";
+			// 
+			// textBoxInfoEmail
+			// 
+			textBoxInfoEmail.Location = new System.Drawing.Point(-1, 111);
+			textBoxInfoEmail.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+			textBoxInfoEmail.Name = "textBoxInfoEmail";
+			textBoxInfoEmail.PasswordChar = '*';
+			textBoxInfoEmail.ReadOnly = true;
+			textBoxInfoEmail.Size = new System.Drawing.Size(252, 27);
+			textBoxInfoEmail.TabIndex = 8;
 			// 
 			// textBoxInfoPassword
 			// 
@@ -261,9 +281,8 @@ namespace Manager
 			// 
 			// checkBoxVisible
 			// 
-			checkBoxVisible.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
 			checkBoxVisible.AutoSize = true;
-			checkBoxVisible.Location = new System.Drawing.Point(428, 238);
+			checkBoxVisible.Location = new System.Drawing.Point(428, 241);
 			checkBoxVisible.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
 			checkBoxVisible.Name = "checkBoxVisible";
 			checkBoxVisible.Size = new System.Drawing.Size(138, 24);
@@ -529,26 +548,6 @@ namespace Manager
 			// 
 			columnHeaderSize.Text = "Encrypted Size";
 			columnHeaderSize.Width = 595;
-			// 
-			// textBoxEmail
-			// 
-			textBoxInfoEmail.Location = new System.Drawing.Point(-1, 111);
-			textBoxInfoEmail.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
-			textBoxInfoEmail.Name = "textBoxEmail";
-			textBoxInfoEmail.PasswordChar = '*';
-			textBoxInfoEmail.ReadOnly = true;
-			textBoxInfoEmail.Size = new System.Drawing.Size(252, 27);
-			textBoxInfoEmail.TabIndex = 8;
-			// 
-			// labelEmail
-			// 
-			labelEmail.AutoSize = true;
-			labelEmail.Location = new System.Drawing.Point(-1, 90);
-			labelEmail.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-			labelEmail.Name = "labelEmail";
-			labelEmail.Size = new System.Drawing.Size(46, 20);
-			labelEmail.TabIndex = 9;
-			labelEmail.Text = "Email";
 			// 
 			// Form1
 			// 

@@ -671,6 +671,15 @@ namespace Password
 		/// </summary>
 		[PropertyID(3)]
 		public int ListViewWidthPassword {  get; set; }
+		/// <summary>
+		/// Name of the saved font.
+		/// </summary>
+		[PropertyID(4)]
+		public string FontName {  get; set; } = "Segoe UI";
+		[PropertyID(5)]
+		public string BackgroundLocation { get; set; } = null;
+		[PropertyID(6)]
+		public bool Incognito { get; set; } = false;
 		public MetaEntry(byte[] key) : base(key)
 		{
 
