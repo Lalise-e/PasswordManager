@@ -75,6 +75,8 @@ namespace Manager
 			columnHeaderSize = new System.Windows.Forms.ColumnHeader();
 			dialogImport = new System.Windows.Forms.OpenFileDialog();
 			dialogExport = new System.Windows.Forms.SaveFileDialog();
+			textBoxEmail = new System.Windows.Forms.TextBox();
+			labelEmail = new System.Windows.Forms.Label();
 			infoPanel.SuspendLayout();
 			menuStrip1.SuspendLayout();
 			tabControl.SuspendLayout();
@@ -87,6 +89,8 @@ namespace Manager
 			// 
 			infoPanel.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
 			infoPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			infoPanel.Controls.Add(labelEmail);
+			infoPanel.Controls.Add(textBoxEmail);
 			infoPanel.Controls.Add(textBoxInfoPassword);
 			infoPanel.Controls.Add(infoPasswordLabel);
 			infoPanel.Controls.Add(infoDomainLabel);
@@ -98,12 +102,12 @@ namespace Manager
 			infoPanel.Location = new System.Drawing.Point(428, 5);
 			infoPanel.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
 			infoPanel.Name = "infoPanel";
-			infoPanel.Size = new System.Drawing.Size(252, 173);
+			infoPanel.Size = new System.Drawing.Size(252, 232);
 			infoPanel.TabIndex = 0;
 			// 
 			// textBoxInfoPassword
 			// 
-			textBoxInfoPassword.Location = new System.Drawing.Point(-1, 149);
+			textBoxInfoPassword.Location = new System.Drawing.Point(-1, 201);
 			textBoxInfoPassword.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
 			textBoxInfoPassword.Name = "textBoxInfoPassword";
 			textBoxInfoPassword.PasswordChar = '*';
@@ -114,7 +118,7 @@ namespace Manager
 			// infoPasswordLabel
 			// 
 			infoPasswordLabel.AutoSize = true;
-			infoPasswordLabel.Location = new System.Drawing.Point(-1, 131);
+			infoPasswordLabel.Location = new System.Drawing.Point(-1, 183);
 			infoPasswordLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
 			infoPasswordLabel.Name = "infoPasswordLabel";
 			infoPasswordLabel.Size = new System.Drawing.Size(70, 20);
@@ -124,7 +128,7 @@ namespace Manager
 			// infoDomainLabel
 			// 
 			infoDomainLabel.AutoSize = true;
-			infoDomainLabel.Location = new System.Drawing.Point(-1, 88);
+			infoDomainLabel.Location = new System.Drawing.Point(-1, 140);
 			infoDomainLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
 			infoDomainLabel.Name = "infoDomainLabel";
 			infoDomainLabel.Size = new System.Drawing.Size(62, 20);
@@ -133,7 +137,7 @@ namespace Manager
 			// 
 			// textBoxInfoDomain
 			// 
-			textBoxInfoDomain.Location = new System.Drawing.Point(-1, 105);
+			textBoxInfoDomain.Location = new System.Drawing.Point(-1, 157);
 			textBoxInfoDomain.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
 			textBoxInfoDomain.Name = "textBoxInfoDomain";
 			textBoxInfoDomain.ReadOnly = true;
@@ -189,7 +193,7 @@ namespace Manager
 			listViewPasswords.MultiSelect = false;
 			listViewPasswords.Name = "listViewPasswords";
 			listViewPasswords.ShowGroups = false;
-			listViewPasswords.Size = new System.Drawing.Size(416, 427);
+			listViewPasswords.Size = new System.Drawing.Size(416, 483);
 			listViewPasswords.Sorting = System.Windows.Forms.SortOrder.Ascending;
 			listViewPasswords.TabIndex = 1;
 			listViewPasswords.UseCompatibleStateImageBehavior = false;
@@ -210,7 +214,7 @@ namespace Manager
 			// buttonAdd
 			// 
 			buttonAdd.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
-			buttonAdd.Location = new System.Drawing.Point(428, 402);
+			buttonAdd.Location = new System.Drawing.Point(428, 458);
 			buttonAdd.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
 			buttonAdd.Name = "buttonAdd";
 			buttonAdd.Size = new System.Drawing.Size(252, 30);
@@ -222,7 +226,7 @@ namespace Manager
 			// buttonEdit
 			// 
 			buttonEdit.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
-			buttonEdit.Location = new System.Drawing.Point(428, 280);
+			buttonEdit.Location = new System.Drawing.Point(428, 336);
 			buttonEdit.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
 			buttonEdit.Name = "buttonEdit";
 			buttonEdit.Size = new System.Drawing.Size(252, 30);
@@ -234,7 +238,7 @@ namespace Manager
 			// buttonDelete
 			// 
 			buttonDelete.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
-			buttonDelete.Location = new System.Drawing.Point(428, 314);
+			buttonDelete.Location = new System.Drawing.Point(428, 370);
 			buttonDelete.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
 			buttonDelete.Name = "buttonDelete";
 			buttonDelete.Size = new System.Drawing.Size(252, 30);
@@ -246,7 +250,7 @@ namespace Manager
 			// buttonCopy
 			// 
 			buttonCopy.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
-			buttonCopy.Location = new System.Drawing.Point(428, 210);
+			buttonCopy.Location = new System.Drawing.Point(428, 266);
 			buttonCopy.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
 			buttonCopy.Name = "buttonCopy";
 			buttonCopy.Size = new System.Drawing.Size(252, 30);
@@ -259,7 +263,7 @@ namespace Manager
 			// 
 			checkBoxVisible.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
 			checkBoxVisible.AutoSize = true;
-			checkBoxVisible.Location = new System.Drawing.Point(428, 182);
+			checkBoxVisible.Location = new System.Drawing.Point(428, 238);
 			checkBoxVisible.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
 			checkBoxVisible.Name = "checkBoxVisible";
 			checkBoxVisible.Size = new System.Drawing.Size(138, 24);
@@ -325,7 +329,7 @@ namespace Manager
 			// buttonWebsite
 			// 
 			buttonWebsite.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
-			buttonWebsite.Location = new System.Drawing.Point(428, 245);
+			buttonWebsite.Location = new System.Drawing.Point(428, 301);
 			buttonWebsite.Name = "buttonWebsite";
 			buttonWebsite.Size = new System.Drawing.Size(252, 30);
 			buttonWebsite.TabIndex = 10;
@@ -341,7 +345,7 @@ namespace Manager
 			tabControl.Location = new System.Drawing.Point(12, 31);
 			tabControl.Name = "tabControl";
 			tabControl.SelectedIndex = 0;
-			tabControl.Size = new System.Drawing.Size(695, 470);
+			tabControl.Size = new System.Drawing.Size(695, 530);
 			tabControl.TabIndex = 11;
 			// 
 			// tabPagePasswords
@@ -358,7 +362,7 @@ namespace Manager
 			tabPagePasswords.Location = new System.Drawing.Point(4, 29);
 			tabPagePasswords.Name = "tabPagePasswords";
 			tabPagePasswords.Padding = new System.Windows.Forms.Padding(3);
-			tabPagePasswords.Size = new System.Drawing.Size(687, 437);
+			tabPagePasswords.Size = new System.Drawing.Size(687, 497);
 			tabPagePasswords.TabIndex = 0;
 			tabPagePasswords.Text = "Login Details";
 			// 
@@ -374,7 +378,7 @@ namespace Manager
 			tabPageTextEntries.Location = new System.Drawing.Point(4, 29);
 			tabPageTextEntries.Name = "tabPageTextEntries";
 			tabPageTextEntries.Padding = new System.Windows.Forms.Padding(3);
-			tabPageTextEntries.Size = new System.Drawing.Size(687, 437);
+			tabPageTextEntries.Size = new System.Drawing.Size(687, 497);
 			tabPageTextEntries.TabIndex = 1;
 			tabPageTextEntries.Text = "Text Entries";
 			// 
@@ -395,7 +399,7 @@ namespace Manager
 			textBoxBody.Name = "textBoxBody";
 			textBoxBody.PlaceholderText = "Body";
 			textBoxBody.ReadOnly = true;
-			textBoxBody.Size = new System.Drawing.Size(477, 390);
+			textBoxBody.Size = new System.Drawing.Size(477, 450);
 			textBoxBody.TabIndex = 4;
 			// 
 			// textBoxTitle
@@ -432,7 +436,7 @@ namespace Manager
 			listViewText.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] { columnHeaderTextTitle });
 			listViewText.Location = new System.Drawing.Point(6, 76);
 			listViewText.Name = "listViewText";
-			listViewText.Size = new System.Drawing.Size(192, 355);
+			listViewText.Size = new System.Drawing.Size(192, 415);
 			listViewText.Sorting = System.Windows.Forms.SortOrder.Ascending;
 			listViewText.TabIndex = 0;
 			listViewText.UseCompatibleStateImageBehavior = false;
@@ -456,7 +460,7 @@ namespace Manager
 			tabPageFiles.Location = new System.Drawing.Point(4, 29);
 			tabPageFiles.Name = "tabPageFiles";
 			tabPageFiles.Padding = new System.Windows.Forms.Padding(3);
-			tabPageFiles.Size = new System.Drawing.Size(687, 437);
+			tabPageFiles.Size = new System.Drawing.Size(687, 497);
 			tabPageFiles.TabIndex = 2;
 			tabPageFiles.Text = "Files";
 			// 
@@ -505,7 +509,7 @@ namespace Manager
 			listViewFiles.FullRowSelect = true;
 			listViewFiles.Location = new System.Drawing.Point(3, 76);
 			listViewFiles.Name = "listViewFiles";
-			listViewFiles.Size = new System.Drawing.Size(678, 355);
+			listViewFiles.Size = new System.Drawing.Size(678, 415);
 			listViewFiles.TabIndex = 0;
 			listViewFiles.UseCompatibleStateImageBehavior = false;
 			listViewFiles.View = System.Windows.Forms.View.Details;
@@ -526,12 +530,32 @@ namespace Manager
 			columnHeaderSize.Text = "Encrypted Size";
 			columnHeaderSize.Width = 595;
 			// 
+			// textBoxEmail
+			// 
+			textBoxEmail.Location = new System.Drawing.Point(-1, 111);
+			textBoxEmail.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+			textBoxEmail.Name = "textBoxEmail";
+			textBoxEmail.PasswordChar = '*';
+			textBoxEmail.ReadOnly = true;
+			textBoxEmail.Size = new System.Drawing.Size(252, 27);
+			textBoxEmail.TabIndex = 8;
+			// 
+			// labelEmail
+			// 
+			labelEmail.AutoSize = true;
+			labelEmail.Location = new System.Drawing.Point(-1, 90);
+			labelEmail.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+			labelEmail.Name = "labelEmail";
+			labelEmail.Size = new System.Drawing.Size(46, 20);
+			labelEmail.TabIndex = 9;
+			labelEmail.Text = "Email";
+			// 
 			// Form1
 			// 
 			AllowDrop = true;
 			AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
 			AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			ClientSize = new System.Drawing.Size(719, 513);
+			ClientSize = new System.Drawing.Size(719, 576);
 			Controls.Add(tabControl);
 			Controls.Add(menuStrip1);
 			Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
@@ -603,6 +627,8 @@ namespace Manager
 		private System.Windows.Forms.ColumnHeader columnHeaderTextTitle;
 		private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemDeleteExport;
 		private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemDeleteImport;
+		private System.Windows.Forms.Label labelEmail;
+		private System.Windows.Forms.TextBox textBoxEmail;
 	}
 }
 
