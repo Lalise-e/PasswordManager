@@ -18,7 +18,7 @@ namespace Manager
 		/// Don't put more stuff in this, I am eventually gonna replace this<br></br>
 		/// Use <see cref="_settings"/> instead.
 		/// </summary>
-		internal static Settings settings_old { get; set; }
+		internal static Settings_old settings_old { get; set; }
 		/// <summary>
 		/// Contains various settings and other information that needs to be saved.
 		/// </summary>
@@ -42,7 +42,7 @@ namespace Manager
 			EncryptedFile.FileDirectory = EntryDirectory;
 			if (File.Exists(SettingsFile))
 			{
-				settings_old = Settings.GetSettings(SettingsFile);
+				settings_old = Settings_old.GetSettings(SettingsFile);
 				this.ApplySettings();
 				toolStripMenuItemIncognito.Checked = settings_old.Incognito;
 			}
@@ -119,7 +119,7 @@ namespace Manager
 		private void ToolStripMenuItemIncognito_Click(object sender, EventArgs e)
 		{
 			settings_old.Incognito = toolStripMenuItemIncognito.Checked;
-			Settings.SaveSettings(SettingsFile, settings_old);
+			Settings_old.SaveSettings(SettingsFile, settings_old);
 		}
 		private void ToolStripMenuItemBackground_Click(object sender, EventArgs e)
 		{
@@ -135,7 +135,7 @@ namespace Manager
 					if (!File.Exists(file))
 						File.Copy(dialog.FileName, file);
 					settings_old.BackgroundLocation = file;
-					Settings.SaveSettings(SettingsFile, settings_old);
+					Settings_old.SaveSettings(SettingsFile, settings_old);
 					this.ApplySettings();
 				}
 			}
@@ -148,7 +148,7 @@ namespace Manager
 				if (result == DialogResult.OK)
 				{
 					settings_old.FontName = dialog.Font.FontFamily.Name;
-					Settings.SaveSettings(SettingsFile, settings_old);
+					Settings_old.SaveSettings(SettingsFile, settings_old);
 					this.ApplySettings();
 				}
 			}
