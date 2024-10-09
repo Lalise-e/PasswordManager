@@ -22,6 +22,7 @@ namespace Manager
             textBoxDomain.Text = entry.Domain.AbsoluteUri;
          textBoxPassword.Text = entry.Password;
          textBoxService.Text = entry.Service;
+         textBoxEmail.Text = entry.Email;
          Entry = entry;
       }
       private void buttonOk_Click(object sender, EventArgs e)
@@ -42,6 +43,7 @@ namespace Manager
          Entry.Password = textBoxPassword.Text;
          Entry.Service = textBoxService.Text;
          Entry.Domain = url;
+         Entry.Email = textBoxEmail.Text;
          DialogResult = DialogResult.OK;
       }
       private void buttonCancel_Click(object sender, EventArgs e)
